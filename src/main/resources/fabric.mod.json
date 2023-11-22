@@ -15,9 +15,9 @@
 	"icon": "assets/modid/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"client": ["stupidcoder.ae2.core.AEClient"],
-		"server": ["stupidcoder.ae2.core.AEServer"],
-        "fabric-datagen": ["stupidcoder.ae2.datagen.DataGenEntryPoint"]
+		"client": ["com.stupidcoderx.ae2.core.AEClient"],
+		"server": ["com.stupidcoderx.ae2.core.AEServer"],
+        "fabric-datagen": ["com.stupidcoderx.ae2.datagen.DataGenEntryPoint"]
     },
 	"mixins": ["modid.mixins.json"],
 	"depends": {

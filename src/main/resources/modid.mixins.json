@@ -3,10 +3,8 @@
 	"package": "stupidcoder.ae2.mixins",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
 	],
     "client": [
-        "ExampleClientMixin"
     ],
 	"injectors": {
 		"defaultRequire": 1
