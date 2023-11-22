@@ -1,16 +1,17 @@
 package com.stupidcoderx.ae2.items;
 
+import com.stupidcoderx.ae2.core.registry.AECreativeTabs;
 import com.stupidcoderx.ae2.util.AEColor;
 import com.stupidcoderx.common.core.Mod;
 import com.stupidcoderx.common.datagen.generators.ItemModelGenerator;
-import com.stupidcoderx.common.item.BaseItem;
+import com.stupidcoderx.common.element.BaseItem;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItem extends BaseItem {
+public class PaintBallItem extends BaseItem<PaintBallItem> {
     private static final Map<AEColor, PaintBallItem> ballsNormal = new EnumMap<>(AEColor.class);
     private static final Map<AEColor, PaintBallItem> ballsLumen = new EnumMap<>(AEColor.class);
     public final boolean isLumen;
@@ -25,15 +26,7 @@ public class PaintBallItem extends BaseItem {
         } else {
             ballsNormal.put(color, this);
         }
-    }
-
-    private static ResourceLocation getLoc(boolean isLumen, AEColor color) {
-        String name = color.id;
-        if (isLumen) {
-            name += "_lumen";
-        }
-        name += "_paint_ball";
-        return new ResourceLocation(Mod.getModId(), name);
+        setCreativeTab(AECreativeTabs.MAIN);
     }
 
     public static void create() {
@@ -58,6 +51,14 @@ public class PaintBallItem extends BaseItem {
         super.commonRegister();
     }
 
+    @Override
+    public void buildData() {
+        ItemModelGenerator.getInstance()
+                .model(location)
+                .parent("minecraft:item/generated")
+                .texture("layer0", isLumen ? "paint_ball_shimmer" : "paint_ball");
+    }
+
     private int calcColor() {
         int rgb = color.rgbNormal;
         int r = rgb >> 16 & 0xff;
@@ -74,11 +75,12 @@ public class PaintBallItem extends BaseItem {
         return rgb | (0xff << 24);
     }
 
-    @Override
-    public void buildData() {
-        ItemModelGenerator.getInstance()
-                .model(location)
-                .parent("minecraft:item/generated")
-                .texture("layer0", isLumen ? "paint_ball_shimmer" : "paint_ball");
+    private static ResourceLocation getLoc(boolean isLumen, AEColor color) {
+        String name = color.id;
+        if (isLumen) {
+            name += "_lumen";
+        }
+        name += "_paint_ball";
+        return new ResourceLocation(Mod.getModId(), name);
     }
 }

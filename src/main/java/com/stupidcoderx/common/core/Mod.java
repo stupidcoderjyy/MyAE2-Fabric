@@ -1,7 +1,8 @@
 package com.stupidcoderx.common.core;
 
 import com.mojang.logging.LogUtils;
-import com.stupidcoderx.common.item.BaseItem;
+import com.stupidcoderx.common.element.BaseItem;
+import com.stupidcoderx.common.element.ModCreativeTab;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ public abstract class Mod {
     public final String modId;
     public static final boolean isEnvDataGen = "true".equals(System.getProperty("mod.isEnvDataGen"));
     protected static List<IRegistry> registries = new ArrayList<>();
-    public static final ElementsRegistry<BaseItem> ITEM_REGISTRY = create("item");
+    public static final ElementsRegistry<BaseItem<?>> ITEM_REGISTRY = create("item");
+    public static final ElementsRegistry<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
     public static final Logger logger = LogUtils.getLogger();
     private static Mod instance;
 
