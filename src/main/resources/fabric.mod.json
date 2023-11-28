@@ -17,7 +17,7 @@
 	"entrypoints": {
 		"client": ["com.stupidcoderx.ae2.core.AEClient"],
 		"server": ["com.stupidcoderx.ae2.core.AEServer"],
-        "fabric-datagen": ["com.stupidcoderx.ae2.datagen.DataGenEntryPoint"]
+        "fabric-datagen": ["com.stupidcoderx.common.entrypoints.DataGenEntryPoint"]
     },
 	"mixins": ["modid.mixins.json"],
 	"depends": {

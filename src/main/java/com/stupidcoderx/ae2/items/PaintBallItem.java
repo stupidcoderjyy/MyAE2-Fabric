@@ -2,16 +2,16 @@ package com.stupidcoderx.ae2.items;
 
 import com.stupidcoderx.ae2.core.registry.AECreativeTabs;
 import com.stupidcoderx.ae2.util.AEColor;
-import com.stupidcoderx.common.core.Mod;
-import com.stupidcoderx.common.datagen.generators.ItemModelGenerator;
-import com.stupidcoderx.common.element.BaseItem;
+import com.stupidcoderx.modding.core.Mod;
+import com.stupidcoderx.modding.datagen.DataProviders;
+import com.stupidcoderx.modding.element.BaseItem;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItem extends BaseItem<PaintBallItem> {
+public class PaintBallItem extends BaseItem {
     private static final Map<AEColor, PaintBallItem> ballsNormal = new EnumMap<>(AEColor.class);
     private static final Map<AEColor, PaintBallItem> ballsLumen = new EnumMap<>(AEColor.class);
     public final boolean isLumen;
@@ -26,7 +26,7 @@ public class PaintBallItem extends BaseItem<PaintBallItem> {
         } else {
             ballsNormal.put(color, this);
         }
-        setCreativeTab(AECreativeTabs.MAIN);
+        creativeTab(AECreativeTabs.MAIN);
     }
 
     public static void create() {
@@ -52,11 +52,10 @@ public class PaintBallItem extends BaseItem<PaintBallItem> {
     }
 
     @Override
-    public void buildData() {
-        ItemModelGenerator.getInstance()
-                .model(location)
+    protected void generateModel() {
+        DataProviders.ITEM.getOrCreateModel(registryLoc)
                 .parent("minecraft:item/generated")
-                .texture("layer0", isLumen ? "paint_ball_shimmer" : "paint_ball");
+                .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
     }
 
     private int calcColor() {

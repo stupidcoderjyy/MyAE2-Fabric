@@ -1,17 +1,15 @@
 package com.stupidcoderx.ae2.core.registry;
 
-import com.stupidcoderx.ae2.items.AEBaseItem;
 import com.stupidcoderx.ae2.items.PaintBallItem;
-import com.stupidcoderx.common.core.IRegistry;
+import com.stupidcoderx.modding.element.BaseItem;
 
-public class AEItems implements IRegistry {
-    public static final AEBaseItem SILICON = new AEBaseItem("silicon")
-            .setCreativeTab(AECreativeTabs.MAIN);
+public class AEItems {
+    public static final BaseItem SILICON = new BaseItem("silicon").creativeTab(AECreativeTabs.MAIN);
 
     static {
         PaintBallItem.create();
     }
 
-    public static void buildElements() {
+    public static void build() {
     }
 }

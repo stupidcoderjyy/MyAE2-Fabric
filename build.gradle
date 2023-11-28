@@ -36,14 +36,14 @@ loom {
             client()
             property "fabric-api.datagen"
             property "fabric-api.datagen.output-dir", file("src/generated/resources").absolutePath
-            property "mod.dataGen.existingResourcesPaths", file("src/main/resources").absolutePath
-            property "mod.isEnvDataGen", "true"
         }
     }
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
+    testImplementation 'junit:junit:4.13.1'
+
+    // To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"

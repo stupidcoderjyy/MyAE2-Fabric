@@ -1,22 +1,22 @@
 package com.stupidcoderx.ae2.core;
 
+import com.stupidcoderx.ae2.core.registry.AEBlocks;
 import com.stupidcoderx.ae2.core.registry.AECreativeTabs;
 import com.stupidcoderx.ae2.core.registry.AEItems;
-import com.stupidcoderx.common.core.Mod;
+import com.stupidcoderx.modding.core.Mod;
 
-public abstract class AE extends Mod {
+public class AE extends Mod {
     public static final String MOD_ID = "ae2";
 
-    public AE() {
+    protected AE() {
         super(MOD_ID);
-        buildElements();
-        commonInit();
-        finishInit();
     }
 
-    private void buildElements() {
-        AECreativeTabs.buildElements();
-        AEItems.buildElements();
+    @Override
+    protected void buildElements() {
+        AECreativeTabs.build();
+        AEItems.build();
+        AEBlocks.build();
     }
 }
 
