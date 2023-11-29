@@ -1,6 +1,8 @@
 package com.stupidcoderx.modding.datagen.model.elements;
 
 import com.google.gson.JsonArray;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -208,6 +210,31 @@ public class Structure {
             elementsObj.add(c.toJson());
         }
         return elementsObj;
+    }
+
+    /**
+     * 将结构转化成等价的{@link VoxelShape}对象
+     * @return 形状
+     */
+    public VoxelShape toVoxelShape() {
+        if (cubes.isEmpty()) {
+            return Shapes.empty();
+        }
+        VoxelShape shape = null;
+        for (Cube c : cubes) {
+            shape = shape == null ?
+                    c.toVoxelShape() :
+                    Shapes.or(shape, c.toVoxelShape());
+        }
+        return shape;
+    }
+
+    /**
+     * 将结构重置
+     */
+    public void clear() {
+        cubes.clear();
+        active.clear();
     }
 
     private Structure shift(Collection<Cube> targets, Direction d, float val) {

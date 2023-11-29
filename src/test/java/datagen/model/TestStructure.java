@@ -54,7 +54,7 @@ public class TestStructure {
                 .scoop(config -> config
                         .range(16, 14, 12)
                         .align(Direction.DOWN, struct.getOutline(Direction.DOWN)))
-                .findMost(Direction.TOP)
+                .findMost(Direction.UP)
                 .process(c -> c.face(Direction.DOWN).texture(dirt))
                 .globalAlign(Direction.DOWN, Direction.NORTH, Direction.EAST)
                 .toJson();

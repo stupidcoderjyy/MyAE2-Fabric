@@ -71,11 +71,15 @@ public class BaseBlock extends Block implements IRegistry {
     }
 
     protected void generateModel() {
-        ModelBuilder mbBlock = DataProviders.BLOCK.getOrCreateModel(registryLoc)
+        ModelBuilder mbBlock = DataProviders.MODEL_BLOCK.getOrCreateModel(registryLoc)
                 .parent("minecraft:block/cube_all")
                 .texture("all", registryLoc);
+        generateItemModel(mbBlock);
+    }
+
+    protected void generateItemModel(ModelBuilder mbBlock) {
         DataProviders.ITEM.getOrCreateModel(registryLoc)
-                .parent(mbBlock);
+            .parent(mbBlock);
     }
 
     protected void generateBlockState() {

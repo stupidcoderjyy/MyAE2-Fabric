@@ -3,6 +3,8 @@ package com.stupidcoderx.modding.datagen.model.elements;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import com.stupidcoderx.modding.util.JsonUtil;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -142,6 +144,16 @@ public class Cube extends SeparateObject<Cube> {
         return this;
     }
 
+    /**
+     * 移除所有的活动面
+     * @return 调用者
+     */
+    public Cube removeFaces() {
+        activeFaces.forEach(f -> faces.remove(f.direction));
+        activeFaces.clear();
+        return this;
+    }
+
     public float length() {
         return data[3] - data[0];
     }
@@ -152,6 +164,10 @@ public class Cube extends SeparateObject<Cube> {
 
     public float width() {
         return data[5] - data[2];
+    }
+
+    VoxelShape toVoxelShape() {
+        return Block.box(data[0], data[1], data[2], data[3], data[4], data[5]);
     }
 
     JsonObject toJson() {
@@ -223,10 +239,10 @@ public class Cube extends SeparateObject<Cube> {
         //对与direction垂直的四个面对应的uv进行切割，由于MC中各个面的材质坐标系不满足对称性，所以只能枚举
         switch (d.dim) {
             case 0 -> { //x
-                set(Direction.TOP, d.isPositive, 0);
-                set(Direction.EAST, d.isPositive, 0);
+                set(Direction.UP, d.isPositive, 0);
+                set(Direction.SOUTH, d.isPositive, 0);
                 set(Direction.DOWN, d.isPositive, 0);
-                set(Direction.WEST, !d.isPositive, 0);
+                set(Direction.NORTH, !d.isPositive, 0);
             }
             case 1 -> { //y
                 for (Direction vd : Direction.getVertical(d)) {
@@ -234,10 +250,10 @@ public class Cube extends SeparateObject<Cube> {
                 }
             }
             case 2 -> { //z
-                set(Direction.TOP, !d.isPositive, 1);
-                set(Direction.SOUTH, d.isPositive, 0);
+                set(Direction.UP, !d.isPositive, 1);
+                set(Direction.EAST, d.isPositive, 0);
                 set(Direction.DOWN, !d.isPositive, 1);
-                set(Direction.NORTH, !d.isPositive, 0);
+                set(Direction.WEST, !d.isPositive, 0);
             }
         }
     }

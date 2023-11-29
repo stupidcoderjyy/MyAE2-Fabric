@@ -1,5 +1,6 @@
 package com.stupidcoderx.ae2.core.registry;
 
+import com.stupidcoderx.ae2.blocks.ChairBlock;
 import com.stupidcoderx.modding.element.BaseBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
@@ -16,6 +17,7 @@ public class AEBlocks {
 
     //Decorative
     public static final BaseBlock QUARTZ_BLOCK = simple(PROP_QUARTZ, "quartz_block");
+    public static final ChairBlock CHAIR = new ChairBlock(PROP_QUARTZ, "chair");
 
     private static BaseBlock simple(Properties p, String id) {
         return new BaseBlock(p, id).creativeTab(AECreativeTabs.MAIN);

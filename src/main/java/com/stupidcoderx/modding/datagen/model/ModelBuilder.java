@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class ModelBuilder extends ModelFile{
     protected final Map<String, ResourceLocation> textures = new HashMap<>();
@@ -42,10 +41,13 @@ public class ModelBuilder extends ModelFile{
         return this;
     }
 
-    public ModelBuilder struct(Consumer<Structure> builder) {
+    public ModelBuilder texture(String key, String loc) {
+        return texture(key, new ResourceLocation(loc));
+    }
+
+    public ModelBuilder struct(Structure s) {
         Preconditions.checkState(structure == null, "structure already created");
-        structure = new Structure();
-        builder.accept(structure);
+        structure = s;
         return this;
     }
 
