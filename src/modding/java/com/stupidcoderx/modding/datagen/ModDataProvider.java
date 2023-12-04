@@ -2,20 +2,24 @@ package com.stupidcoderx.modding.datagen;
 
 import com.google.gson.JsonObject;
 import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public abstract class ModDataProvider<T extends ModDataProvider<T>> implements DataProvider {
+    static List<ModDataProvider<?>> providers = new ArrayList<>();
     protected PackOutput output;
 
     public ModDataProvider() {
-        DataProviders.providers.add(this);
+        providers.add(this);
     }
 
     public T init(PackOutput output) {
@@ -44,5 +48,10 @@ public abstract class ModDataProvider<T extends ModDataProvider<T>> implements D
             futures[i++] = supplier.apply(e);
         }
         return CompletableFuture.allOf(futures);
+    }
+
+    static void register(DataGenerator.PackGenerator pack) {
+        providers.forEach(p -> pack.addProvider(p::init));
+        providers = null;
     }
 }

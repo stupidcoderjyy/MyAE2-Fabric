@@ -1,24 +1,25 @@
-package com.stupidcoderx.ae2.items;
+package com.stupidcoderx.ae2.elements.items;
 
-import com.stupidcoderx.ae2.core.registry.AECreativeTabs;
+import com.stupidcoderx.ae2.registry.AECreativeTabs;
 import com.stupidcoderx.ae2.util.AEColor;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
-import com.stupidcoderx.modding.element.BaseItem;
+import com.stupidcoderx.modding.element.item.ItemDef;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItem extends BaseItem {
-    private static final Map<AEColor, PaintBallItem> ballsNormal = new EnumMap<>(AEColor.class);
-    private static final Map<AEColor, PaintBallItem> ballsLumen = new EnumMap<>(AEColor.class);
+public class PaintBallItemDef extends ItemDef<Item> {
+    private static final Map<AEColor, PaintBallItemDef> ballsNormal = new EnumMap<>(AEColor.class);
+    private static final Map<AEColor, PaintBallItemDef> ballsLumen = new EnumMap<>(AEColor.class);
     public final boolean isLumen;
     public final AEColor color;
 
-    public PaintBallItem(boolean isLumen, AEColor color) {
-        super(getLoc(isLumen, color));
+    private PaintBallItemDef(boolean isLumen, AEColor color) {
+        super(getLoc(isLumen, color), new Item(new Item.Properties()));
         this.isLumen = isLumen;
         this.color = color;
         if (isLumen) {
@@ -26,19 +27,19 @@ public class PaintBallItem extends BaseItem {
         } else {
             ballsNormal.put(color, this);
         }
-        creativeTab(AECreativeTabs.MAIN);
+        setCreativeTab(AECreativeTabs.MAIN);
     }
 
     public static void create() {
         for (AEColor c : AEColor.values()) {
-            new PaintBallItem(false, c);
+            new PaintBallItemDef(false, c);
         }
         for (AEColor c : AEColor.values()) {
-            new PaintBallItem(true, c);
+            new PaintBallItemDef(true, c);
         }
     }
 
-    public static PaintBallItem fromColor(AEColor color, boolean isLumen) {
+    public static PaintBallItemDef get(AEColor color, boolean isLumen) {
         if (isLumen) {
             return ballsLumen.get(color);
         }
@@ -53,7 +54,7 @@ public class PaintBallItem extends BaseItem {
 
     @Override
     protected void generateModel() {
-        DataProviders.ITEM.getOrCreateModel(registryLoc)
+        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
     }

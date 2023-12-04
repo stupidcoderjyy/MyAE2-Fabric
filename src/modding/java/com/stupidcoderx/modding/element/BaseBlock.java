@@ -66,19 +66,19 @@ public class BaseBlock extends Block implements IRegistry {
     @Override
     public void buildData() {
         Preconditions.checkState(registryLoc != null, "missing id");
-        generateModel();
+        ModelBuilder mb = DataProviders.MODEL_BLOCK.getOrCreateModel(registryLoc);
+        generateBlockModel(mb);
+        generateItemModel(mb);
         generateBlockState();
     }
 
-    protected void generateModel() {
-        ModelBuilder mbBlock = DataProviders.MODEL_BLOCK.getOrCreateModel(registryLoc)
-                .parent("minecraft:block/cube_all")
+    protected void generateBlockModel(ModelBuilder mbBlock) {
+        mbBlock.parent("minecraft:block/cube_all")
                 .texture("all", registryLoc);
-        generateItemModel(mbBlock);
     }
 
     protected void generateItemModel(ModelBuilder mbBlock) {
-        DataProviders.ITEM.getOrCreateModel(registryLoc)
+        DataProviders.MODEL_ITEM.getOrCreateModel(registryLoc)
             .parent(mbBlock);
     }
 

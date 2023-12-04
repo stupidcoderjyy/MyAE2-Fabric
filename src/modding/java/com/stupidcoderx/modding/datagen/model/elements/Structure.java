@@ -37,15 +37,15 @@ public class Structure {
      * @param op 配置挖勺工作参数的逻辑
      * @return 调用者
      */
-    public Structure globalScoop(Consumer<SeparationConfig> op) {
-        SeparationConfig cfg = new SeparationConfig();
+    public Structure globalScoop(Consumer<SeparationConfig<Cube>> op) {
+        SeparationConfig<Cube> cfg = new SeparationConfig<>();
         op.accept(cfg);
         for (Cube e : cubes) {
             SeparationResult<Cube> result = e.separate(cfg);
             if (result.children.isEmpty()) {
                 continue;
             }
-            cfg.finishedOp.accept(result);
+            cfg.finishedAction.accept(result);
         }
         return this;
     }
@@ -140,10 +140,10 @@ public class Structure {
      * @param op 配置挖勺工作参数的逻辑
      * @return 调用者
      */
-    public Structure scoop(Consumer<SeparationConfig> op) {
+    public Structure scoop(Consumer<SeparationConfig<Cube>> op) {
         List<Cube> temp = new ArrayList<>(active);
         active.clear();
-        SeparationConfig cfg = new SeparationConfig();
+        SeparationConfig<Cube> cfg = new SeparationConfig<>();
         op.accept(cfg);
         for (Cube e : temp) {
             SeparationResult<Cube> result = e.separate(cfg);
@@ -152,7 +152,7 @@ public class Structure {
             }
             cubes.remove(e);
             result.children.forEach((d, childCube) -> active.add(childCube));
-            cfg.finishedOp.accept(result);
+            cfg.finishedAction.accept(result);
         }
         cubes.forEach(this::updateOutline);
         return this;

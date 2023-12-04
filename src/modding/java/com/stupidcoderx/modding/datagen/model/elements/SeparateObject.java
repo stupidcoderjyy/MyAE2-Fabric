@@ -1,6 +1,7 @@
 package com.stupidcoderx.modding.datagen.model.elements;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public abstract class SeparateObject<T extends SeparateObject<T>> {
     final int dim;
@@ -20,7 +21,7 @@ public abstract class SeparateObject<T extends SeparateObject<T>> {
         return target;
     }
 
-    SeparationResult<T> separate(SeparationConfig config) {
+    SeparationResult<T> separate(SeparationConfig<T> config) {
         SeparationResult<T> result = new SeparationResult<>();
         float[] range = Arrays.copyOf(config.range, 6);
         if (isSeparated(range)) {
@@ -33,20 +34,27 @@ public abstract class SeparateObject<T extends SeparateObject<T>> {
                 Direction d = Direction.get(false, i);
                 T c = copy();
                 c.data[j] = range[i];
-                result.children.put(d, c);
-                onSeparated(d, c, range);
+                onSeparated(config, d, c, range, result);
                 data[i] = range[i];
             }
             if (range[j] < data[j]) {
                 Direction d = Direction.get(true, i);
                 T c = copy();
                 c.data[i] = range[j];
-                result.children.put(d, c);
-                onSeparated(d, c, range);
+                onSeparated(config, d, c, range, result);
                 data[j] = range[j];
             }
         }
         return result;
+    }
+
+    private void onSeparated(SeparationConfig<T> config, Direction d, T c, float[] range, SeparationResult<T> res) {
+        res.children.put(d, c);
+        onSeparated(d, c, range);
+        Consumer<T> op = config.separateActions.get(d);
+        if (op != null) {
+            op.accept(c);
+        }
     }
 
     private void shrink(float[] r) {

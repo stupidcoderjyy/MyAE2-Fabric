@@ -18,15 +18,6 @@ public class ModelProvider extends ModDataProvider<ModelProvider> {
     private final IGeneratorDataRegistry registry;
     private final String prefix;
 
-    public ModelProvider(
-            String pathPrefix,
-            Function<ResourceLocation, ModelBuilder> defaultModelBuilderSupplier,
-            IGeneratorDataRegistry registry) {
-        this.prefix = pathPrefix;
-        this.defaultModelBuilderSupplier = defaultModelBuilderSupplier;
-        this.registry = registry;
-    }
-
     public ModelProvider(String pathPrefix, IGeneratorDataRegistry registry) {
         this.prefix = pathPrefix;
         this.defaultModelBuilderSupplier = loc -> new ModelBuilder(pathPrefix, loc);

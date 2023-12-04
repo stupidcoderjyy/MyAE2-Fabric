@@ -7,6 +7,7 @@ public class DataGenEntryPoint implements DataGeneratorEntrypoint {
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
-        DataProviders.init(generator.createPack());
+        DataProviders.init();
+        ModDataProvider.register(generator.createPack());
     }
 }
