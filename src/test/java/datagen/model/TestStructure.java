@@ -56,7 +56,7 @@ public class TestStructure {
                         .align(Direction.DOWN, struct.getOutline(Direction.DOWN)))
                 .findMost(Direction.UP)
                 .process(c -> c.face(Direction.DOWN).texture(dirt))
-                .globalAlign(Direction.DOWN, Direction.NORTH, Direction.EAST)
+                .globalAlign(0, Direction.DOWN, Direction.NORTH, Direction.EAST)
                 .toJson();
         System.out.println(json);
     }

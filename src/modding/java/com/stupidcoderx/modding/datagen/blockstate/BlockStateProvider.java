@@ -13,6 +13,10 @@ import java.util.concurrent.CompletableFuture;
 public class BlockStateProvider extends ModDataProvider<BlockStateProvider> {
     private final Map<ResourceLocation, IBlockStateBuilder> stateBuilders = new HashMap<>();
 
+    public BlockStateProvider() {
+        super(ResourceType.BLOCK_STATE, () -> {});
+    }
+
     public VariantsBlockStateBuilder variants(ResourceLocation loc) {
         Preconditions.checkArgument(!stateBuilders.containsKey(loc),
                 "block state builder for " + loc + " already exists");
@@ -24,7 +28,7 @@ public class BlockStateProvider extends ModDataProvider<BlockStateProvider> {
     @Override
     public CompletableFuture<?> run(CachedOutput cache) {
         return getCollectedTask(stateBuilders.entrySet(),
-                e -> getJsonWritingTask(e.getKey(), e.getValue().toJson(), cache, ResourceType.BLOCK_STATE));
+                e -> getJsonWritingTask(e.getKey(), e.getValue().toJson(), cache));
     }
 
     @Override

@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-public class ItemDef<I extends Item> implements IRegistry, ItemLike {
+public abstract class ItemDef<D extends ItemDef<D, I>, I extends Item> implements IRegistry, ItemLike {
     public final I item;
     public final ResourceLocation loc;
 
@@ -26,6 +26,17 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
 
     public ItemDef(String id, I item) {
         this(Mod.modLoc(id), item);
+    }
+
+    public D creativeTab(ModCreativeTab tab) {
+        tab.add(this);
+        return self();
+    }
+
+    public D creativeTab(ResourceKey<CreativeModeTab> tabKey) {
+        ItemGroupEvents.modifyEntriesEvent(tabKey)
+                .register(entries -> entries.accept(this));
+        return self();
     }
 
     @Override
@@ -47,18 +58,13 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
         generateModel();
     }
 
-    public void setCreativeTab(ModCreativeTab tab) {
-        tab.add(this);
-    }
-
-    public void setCreativeTab(ResourceKey<CreativeModeTab> tabKey) {
-        ItemGroupEvents.modifyEntriesEvent(tabKey)
-                .register(entries -> entries.accept(this));
-    }
-
     protected void generateModel() {
         DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", loc);
+    }
+
+    protected final D self() {
+        return (D)this;
     }
 }

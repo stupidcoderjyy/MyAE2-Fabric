@@ -1,6 +1,6 @@
 package com.stupidcoderx.modding.datagen;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -17,25 +17,29 @@ import java.util.function.Function;
 public abstract class ModDataProvider<T extends ModDataProvider<T>> implements DataProvider {
     static List<ModDataProvider<?>> providers = new ArrayList<>();
     protected PackOutput output;
+    private final ResourceType resourceType;
+    private final IGeneratorDataRegistry registry;
 
-    public ModDataProvider() {
+    public ModDataProvider(ResourceType resourceType, IGeneratorDataRegistry registry) {
+        this.registry = registry;
         providers.add(this);
+        this.resourceType = resourceType;
     }
 
     public T init(PackOutput output) {
         this.output = output;
+        registry.register();
         return (T)this;
     }
 
     protected CompletableFuture<?> getJsonWritingTask(
             ResourceLocation loc,
-            JsonObject obj,
-            CachedOutput cache,
-            ResourceType type) {
-        Path target = output.getOutputFolder(type.type())
+            JsonElement obj,
+            CachedOutput cache) {
+        Path target = output.getOutputFolder(resourceType.type)
                 .resolve(loc.getNamespace())
-                .resolve(type.pathPrefix())
-                .resolve(loc.getPath() + type.pathSuffix());
+                .resolve(resourceType.pathPrefix)
+                .resolve(loc.getPath() + resourceType.pathSuffix);
         return DataProvider.saveStable(cache, obj, target);
     }
 

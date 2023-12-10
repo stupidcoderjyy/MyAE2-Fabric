@@ -40,6 +40,11 @@ public class ToolType implements Tier {
         return this;
     }
 
+    public ToolType speed(float val) {
+        this.speed = val;
+        return this;
+    }
+
     public ToolType repairIngredient(Supplier<ItemLike> val) {
         this.repairIngredient = () -> Ingredient.of(val.get());
         return this;

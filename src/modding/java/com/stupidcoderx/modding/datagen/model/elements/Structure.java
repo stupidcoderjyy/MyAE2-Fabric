@@ -51,15 +51,16 @@ public class Structure {
     }
 
     /**
-     * 将结构靠到标准方块的若干个面上
-     * @param faces 面对应的方向
+     * 将结构沿某个方向平移，直到结构在该方向上的边缘与基准重合
+     * @param base 基准的坐标
+     * @param faces 平移的方向
      * @return 调用者
      */
-    public Structure globalAlign(Direction ... faces) {
+    public Structure globalAlign(int base, Direction ... faces) {
         for (Direction face : faces) {
             float distance = face.isPositive ?
-                    outline[face.dim + 3] - 16 :
-                    outline[face.dim];
+                    base - outline[face.dim + 3] :
+                    outline[face.dim] - base;
             globalShift(face, distance);
         }
         return this;

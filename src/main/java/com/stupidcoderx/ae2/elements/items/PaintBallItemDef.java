@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItemDef extends ItemDef<Item> {
+public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
     private static final Map<AEColor, PaintBallItemDef> ballsNormal = new EnumMap<>(AEColor.class);
     private static final Map<AEColor, PaintBallItemDef> ballsLumen = new EnumMap<>(AEColor.class);
     public final boolean isLumen;
@@ -27,7 +27,7 @@ public class PaintBallItemDef extends ItemDef<Item> {
         } else {
             ballsNormal.put(color, this);
         }
-        setCreativeTab(AECreativeTabs.MAIN);
+        creativeTab(AECreativeTabs.MAIN);
     }
 
     public static void create() {
@@ -81,6 +81,6 @@ public class PaintBallItemDef extends ItemDef<Item> {
             name += "_lumen";
         }
         name += "_paint_ball";
-        return new ResourceLocation(Mod.getModId(), name);
+        return Mod.modLoc(name);
     }
 }

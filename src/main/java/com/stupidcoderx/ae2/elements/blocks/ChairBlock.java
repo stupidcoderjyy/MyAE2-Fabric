@@ -27,7 +27,7 @@ public class ChairBlock extends BaseBlock {
                 .scoop(config -> config
                         .range(16, 14, 12)
                         .align(Direction.DOWN, structure.getOutline(Direction.DOWN)))
-                .globalAlign(Direction.DOWN, Direction.NORTH, Direction.WEST)
+                .globalAlign(0, Direction.DOWN, Direction.NORTH, Direction.WEST)
                 .toVoxelShape();
     }
 

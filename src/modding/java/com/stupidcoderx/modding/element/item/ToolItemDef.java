@@ -4,7 +4,7 @@ import com.stupidcoderx.modding.datagen.DataProviders;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
-public class ToolItemDef<T extends Item> extends ItemDef<T> {
+public class ToolItemDef<T extends Item> extends ItemDef<ToolItemDef<T>, T> {
     public ToolItemDef(ResourceLocation loc, T item) {
         super(loc, item);
     }

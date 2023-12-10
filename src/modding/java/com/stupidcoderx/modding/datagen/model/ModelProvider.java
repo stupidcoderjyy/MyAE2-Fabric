@@ -1,10 +1,10 @@
 package com.stupidcoderx.modding.datagen.model;
 
 import com.google.common.base.Preconditions;
+import com.stupidcoderx.modding.datagen.IGeneratorDataRegistry;
 import com.stupidcoderx.modding.datagen.ModDataProvider;
 import com.stupidcoderx.modding.datagen.ResourceType;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -15,20 +15,12 @@ import java.util.function.Function;
 public class ModelProvider extends ModDataProvider<ModelProvider> {
     private final Map<ResourceLocation, ModelBuilder> models = new HashMap<>();
     private final Function<ResourceLocation, ModelBuilder> defaultModelBuilderSupplier;
-    private final IGeneratorDataRegistry registry;
     private final String prefix;
 
     public ModelProvider(String pathPrefix, IGeneratorDataRegistry registry) {
+        super(ResourceType.MODEL, registry);
         this.prefix = pathPrefix;
         this.defaultModelBuilderSupplier = loc -> new ModelBuilder(pathPrefix, loc);
-        this.registry = registry;
-    }
-
-    @Override
-    public ModelProvider init(PackOutput out) {
-        this.output = out;
-        registry.register();
-        return this;
     }
 
     /**
@@ -45,7 +37,7 @@ public class ModelProvider extends ModDataProvider<ModelProvider> {
     @Override
     public CompletableFuture<?> run(CachedOutput cache) {
         return getCollectedTask(models.entrySet(),
-                e -> getJsonWritingTask(e.getKey(), e.getValue().toJson(), cache, ResourceType.MODEL));
+                e -> getJsonWritingTask(e.getKey(), e.getValue().toJson(), cache));
     }
 
     @Override

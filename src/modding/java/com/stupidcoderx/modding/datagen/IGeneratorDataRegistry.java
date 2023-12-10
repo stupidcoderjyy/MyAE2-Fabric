@@ -1,4 +1,4 @@
-package com.stupidcoderx.modding.datagen.model;
+package com.stupidcoderx.modding.datagen;
 
 /**
  * 向生成器中注册数据

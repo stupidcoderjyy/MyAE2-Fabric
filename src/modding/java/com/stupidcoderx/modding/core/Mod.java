@@ -2,6 +2,7 @@ package com.stupidcoderx.modding.core;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
+import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
 import com.stupidcoderx.modding.element.BaseBlock;
 import com.stupidcoderx.modding.element.ModCreativeTab;
 import com.stupidcoderx.modding.element.item.ItemDef;
@@ -15,9 +16,10 @@ public abstract class Mod {
     public final String modId;
     public static final boolean isEnvDataGen = System.getProperty("fabric-api.datagen") != null;
     protected static List<IRegistry> registries = new ArrayList<>();
-    public static final ElementsRegistry<ItemDef<?>> ITEM_REGISTRY = create("item");
+    public static final ElementsRegistry<ItemDef<?,?>> ITEM_REGISTRY = create("item");
     public static final ElementsRegistry<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
     public static final ElementsRegistry<BaseBlock> BLOCK_REGISTRY = create("block");
+    public static final ElementsRegistry<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
     public static final Logger logger = LogUtils.getLogger();
     private static Mod instance;
     private final Stopwatch watch = Stopwatch.createUnstarted();
@@ -59,6 +61,10 @@ public abstract class Mod {
 
     public static ResourceLocation modLoc(String path) {
         return new ResourceLocation(getModId(), path);
+    }
+
+    public static ResourceLocation loc(String path) {
+        return new ResourceLocation(path);
     }
 
     private static <T extends IRegistry> ElementsRegistry<T> create(String name) {

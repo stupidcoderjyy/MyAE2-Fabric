@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelBuilder extends ModelFile{
-    protected final Map<String, ResourceLocation> textures = new HashMap<>();
-    protected final String pathPrefix;
-    protected Structure structure;
+    private final Map<String, ResourceLocation> textures = new HashMap<>();
+    private final String pathPrefix;
+    private Structure structure;
     @Nullable
-    protected ModelFile parent;
+    private ModelFile parent;
 
     protected ModelBuilder(String pathPrefix, ResourceLocation location) {
         super(location);
