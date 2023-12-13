@@ -10,10 +10,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,6 +43,10 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
     public RecipeDef<R> register(String recipeId, Consumer<R> builder) {
         recipeFactories.put(Mod.modLoc(typeLoc.getPath() + "/" + recipeId), builder);
         return this;
+    }
+
+    public List<RecipeHolder<R>> getRegisteredRecipes(Level world) {
+        return world.getRecipeManager().getRecipesFor(type, null, world);
     }
 
     @Override

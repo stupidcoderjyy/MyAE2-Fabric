@@ -6,11 +6,17 @@ import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
 import com.stupidcoderx.modding.util.serialize.ArrayVal;
 import com.stupidcoderx.modding.util.serialize.ContainerVal;
 import com.stupidcoderx.modding.util.serialize.Val;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +33,7 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         super(def);
     }
 
-    public EntropyRecipe coolMode(boolean cool) {
+    public EntropyRecipe cool(boolean cool) {
         root.newString("mode").set(cool ? "cool" : "heat");
         return this;
     }
@@ -119,5 +125,21 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         Item item = BuiltInRegistries.ITEM.get(Mod.loc(stackContainer.get("id").asString().get()));
         Val<?, ?> countVal = stackContainer.get("count");
         return new ItemStack(item, countVal == null ? 1 : countVal.asInt().get());
+    }
+
+    public boolean matches(boolean isCool, @NotNull Block block, @NotNull Fluid fluid) {
+        return isCool == this.isCool && (inputBlock == block || inputFluid == fluid);
+    }
+
+    public void apply(Level level, BlockPos pos) {
+        if (outputBlock != null) {
+            level.setBlock(pos, outputBlock.defaultBlockState(), 3);
+        }
+        if (outputFluid != null) {
+            level.setBlock(pos, outputFluid.defaultFluidState().createLegacyBlock(), 3);
+        }
+        SoundEvent sound = isCool ? SoundEvents.BASALT_PLACE : SoundEvents.FIRE_EXTINGUISH;
+        level.playSound(null, pos, sound, SoundSource.BLOCKS,
+                0.5f, 2.6F + (level.random.nextFloat() - level.random.nextFloat()) * 0.8F);
     }
 }

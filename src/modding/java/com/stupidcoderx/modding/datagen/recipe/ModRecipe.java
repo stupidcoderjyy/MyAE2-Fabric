@@ -31,7 +31,7 @@ public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Contai
      */
     @Override
     public boolean matches(Container container, Level level) {
-        return false;
+        return true;
     }
 
     /**
