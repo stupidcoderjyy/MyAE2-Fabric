@@ -2,13 +2,14 @@ package com.stupidcoderx.modding.core;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.authlib.GameProfile;
-import com.mojang.logging.LogUtils;
 import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
 import com.stupidcoderx.modding.element.BaseBlock;
 import com.stupidcoderx.modding.element.ModCreativeTab;
 import com.stupidcoderx.modding.element.item.ItemDef;
 import com.stupidcoderx.modding.util.DimensionalBlockPos;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -18,39 +19,50 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public abstract class Mod {
-    public final String modId;
     public static final boolean isEnvDataGen = System.getProperty("fabric-api.datagen") != null;
+    public static final boolean isEnvClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     protected static List<IRegistry> registries = new ArrayList<>();
     public static final ElementsRegistry<ItemDef<?,?>> ITEM_REGISTRY = create("item");
     public static final ElementsRegistry<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
     public static final ElementsRegistry<BaseBlock> BLOCK_REGISTRY = create("block");
     public static final ElementsRegistry<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
-    public static final Logger logger = LogUtils.getLogger();
     private static Mod instance;
+
+    public final String modId;
     private final Stopwatch watch = Stopwatch.createUnstarted();
 
     protected Mod(String modId) {
         this.modId = modId;
         instance = this;
+        if (isEnvClient) {
+            bootstrapClient();
+        }
+        watch.start();
         buildElements();
-        commonInit();
+        ModLog.info("build elements: %s, took %dms", modId, watch.elapsed().toMillis());
+        watch.reset();
+        init();
         finishInit();
+        ModLog.info("finish init: %s", modId);
     }
 
     protected abstract void buildElements();
 
-    protected void commonInit() {
-        watch.start();
+    protected void init() {
         for (IRegistry r : registries) {
-            logger.info("common init: " + r.debugName());
+            watch.start();
             r.commonRegister();
+            if (isEnvClient) {
+                r.clientRegister();
+            }
+            ModLog.info("init: %s, took %dms", r.debugName(), watch.elapsed().toMillis());
+            watch.reset();
         }
     }
 
@@ -58,9 +70,11 @@ public abstract class Mod {
         for (IRegistry r : registries) {
             r.close();
         }
-        watch.stop();
         registries = null;
-        logger.info("finish init: {}, took {}ms", modId, watch.elapsed().toMillis());
+    }
+
+    protected void bootstrapClient() {
+        registries.add(BuiltInModelRegistry.INSTANCE);
     }
 
     public static <T extends Mod> T getMod() {

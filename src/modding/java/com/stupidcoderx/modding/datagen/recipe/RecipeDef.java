@@ -1,7 +1,6 @@
 package com.stupidcoderx.modding.datagen.recipe;
 
-import com.google.gson.JsonElement;
-import com.mojang.serialization.Codec;
+import com.google.gson.JsonObject;
 import com.stupidcoderx.modding.core.IRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
@@ -9,26 +8,22 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, RecipeSerializer<R> {
     final RecipeType<R> type;
     final ResourceLocation typeLoc;
     final Map<ResourceLocation, Consumer<R>> recipeFactories = new HashMap<>();
-    final Function<RecipeDef<R>, R> emptyRecipeSupplier;
-    private final Codec<R> codec = ExtraCodecs.adaptJsonSerializer(this::fromJson, this::toJson);
+    final BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier;
 
-    public RecipeDef(String typeId, Function<RecipeDef<R>, R> emptyRecipeSupplier) {
+    public RecipeDef(String typeId, BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier) {
         this.typeLoc = Mod.modLoc(typeId);
         this.type = new RecipeType<>() {
             @Override
@@ -45,8 +40,8 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
         return this;
     }
 
-    public List<RecipeHolder<R>> getRegisteredRecipes(Level world) {
-        return world.getRecipeManager().getRecipesFor(type, null, world);
+    public Map<ResourceLocation, R> getRegisteredRecipes(Level world) {
+        return world.getRecipeManager().byType(type);
     }
 
     @Override
@@ -56,30 +51,22 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
     }
 
     @Override
-    public void buildData() {
+    public void provideData() {
         DataProviders.RECIPE.registerType(this);
     }
 
-    private JsonElement toJson(R recipe) {
-        return recipe.root.toJson(null);
-    }
-
-    private R fromJson(JsonElement root) {
-        R r = createEmpty();
-        r.root.fromJson(root);
+    @Override
+    public R fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
+        R r = createEmpty(loc);
+        r.root.fromNetWork(buf);
         r.onDeserialized();
         return r;
     }
 
     @Override
-    public Codec<R> codec() {
-        return codec;
-    }
-
-    @Override
-    public R fromNetwork(FriendlyByteBuf buf) {
-        R r = createEmpty();
-        r.root.fromNetWork(buf);
+    public R fromJson(ResourceLocation loc, JsonObject root) {
+        R r = createEmpty(loc);
+        r.root.fromJson(root);
         r.onDeserialized();
         return r;
     }
@@ -89,12 +76,12 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
         recipe.root.toNetWork(buf);
     }
 
-    R createEmpty() {
-        return emptyRecipeSupplier.apply(this);
+    R createEmpty(ResourceLocation loc) {
+        return emptyRecipeSupplier.apply(loc, this);
     }
 
     R createFull(ResourceLocation loc) {
-        R e = emptyRecipeSupplier.apply(this);
+        R e = emptyRecipeSupplier.apply(loc, this);
         recipeFactories.get(loc).accept(e);
         return e;
     }

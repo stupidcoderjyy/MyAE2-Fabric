@@ -64,7 +64,7 @@ public class BaseBlock extends Block implements IRegistry {
     }
 
     @Override
-    public void buildData() {
+    public void provideData() {
         Preconditions.checkState(registryLoc != null, "missing id");
         ModelBuilder mb = DataProviders.MODEL_BLOCK.getOrCreateModel(registryLoc);
         generateBlockModel(mb);

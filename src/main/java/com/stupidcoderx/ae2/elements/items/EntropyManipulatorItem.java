@@ -132,9 +132,9 @@ public class EntropyManipulatorItem extends Item {
     }
 
     private EntropyRecipe findRecipe(boolean isCool, Level level, Block block, Fluid fluid) {
-        for (var r : AERecipes.ENTROPY.getRegisteredRecipes(level)) {
-            if (r.value().matches(isCool, block, fluid)) {
-                return r.value();
+        for (var entry : AERecipes.ENTROPY.getRegisteredRecipes(level).entrySet()) {
+            if (entry.getValue().matches(isCool, block, fluid)) {
+                return entry.getValue();
             }
         }
         return null;
@@ -157,9 +157,12 @@ public class EntropyManipulatorItem extends Item {
             if (optional.isEmpty()) {
                 return false;
             }
-            ItemStack result = optional.get().value().assemble(tempInv, level.registryAccess());
+            ItemStack result = optional.get().assemble(tempInv, level.registryAccess());
             if (result.getItem() instanceof BlockItem) {
                 Block candidate = Block.byItem(result.getItem());
+                if (candidate == state.getBlock()) {
+                    continue;  //排除石头、深板岩这种方块
+                }
                 if (outBlock == null) {
                     outBlock = candidate; //只有第一个方块才会放置
                     continue;

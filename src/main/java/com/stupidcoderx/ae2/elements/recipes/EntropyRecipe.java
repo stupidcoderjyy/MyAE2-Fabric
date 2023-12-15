@@ -8,6 +8,7 @@ import com.stupidcoderx.modding.util.serialize.ContainerVal;
 import com.stupidcoderx.modding.util.serialize.Val;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,13 +25,12 @@ import java.util.List;
 public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
     private static final int BLOCK = 0, FLUID = 1, ITEM = 2;
     private boolean isCool;
-    private int inputType, outputType;
     private Block inputBlock, outputBlock;
     private Fluid inputFluid, outputFluid;
     private List<ItemStack> droppedItems;
 
-    public EntropyRecipe(RecipeDef<EntropyRecipe> def) {
-        super(def);
+    public EntropyRecipe(ResourceLocation loc, RecipeDef<EntropyRecipe> def) {
+        super(loc, def);
     }
 
     public EntropyRecipe cool(boolean cool) {
@@ -81,14 +81,14 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
     @Override
     protected void onDeserialized() {
         isCool = root.get("mode").asString().get().equals("cool");
-        inputType = parseType(root.get("input_type"));
+        int inputType = parseType(root.get("input_type"));
         Val<?,?> inputVal = root.get("input");
         switch (inputType) {
             case BLOCK -> inputBlock = parseBlock(inputVal);
             case FLUID -> inputFluid = parseFluid(inputVal);
         }
 
-        outputType = parseType(root.get("output_type"));
+        int outputType = parseType(root.get("output_type"));
         Val<?,?> outputVal = root.get("output");
         switch (outputType) {
             case BLOCK -> outputBlock = parseBlock(outputVal);
@@ -137,6 +137,9 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         }
         if (outputFluid != null) {
             level.setBlock(pos, outputFluid.defaultFluidState().createLegacyBlock(), 3);
+        }
+        if (droppedItems != null) {
+            Mod.spawnDropItems(level, pos, droppedItems);
         }
         SoundEvent sound = isCool ? SoundEvents.BASALT_PLACE : SoundEvents.FIRE_EXTINGUISH;
         level.playSound(null, pos, sound, SoundSource.BLOCKS,

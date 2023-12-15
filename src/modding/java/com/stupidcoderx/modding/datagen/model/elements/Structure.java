@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.datagen.model.elements;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -9,13 +10,37 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * 可以储存由若干{@link Cube}组成的结构。
+ * 可以储存由若干{@link Cube}组成的结构。结构拥有固定的坐标系，原点为workspace中
+ * {@link Direction#NX_WEST}、{@link Direction#NY_DOWN}和{@link Direction#NZ_NORTH}
+ * 对应的三个面所交的点
  */
 public class Structure {
     private static int maxId = 0;
     private final float[] outline = new float[6];
+    private final float[] workspace = new float[6];
     private final Set<Cube> cubes = new HashSet<>();
     private final List<Cube> active = new ArrayList<>();
+    private ICubeCreateStrategy cubeCreateStrategy = ICubeCreateStrategy.CENTER;
+    private final float[] basePoint = new float[3];
+
+    public Structure(IBasePointStrategy basePointStrategy, float xLen, float yLen, float zLen) {
+        Preconditions.checkNotNull(basePointStrategy);
+        Preconditions.checkArgument(xLen > 0);
+        Preconditions.checkArgument(yLen > 0);
+        Preconditions.checkArgument(zLen > 0);
+        workspace[3] = xLen;
+        workspace[4] = yLen;
+        workspace[5] = zLen;
+        basePointStrategy.setBasePoint(basePoint, xLen, yLen, zLen);
+    }
+
+    public Structure(IBasePointStrategy basePointStrategy) {
+        this(basePointStrategy, 16,16,16);
+    }
+
+    public Structure() {
+        this(IBasePointStrategy.CENTER);
+    }
 
     void internalAdd(Cube e) {
         cubes.add(e);
@@ -24,12 +49,15 @@ public class Structure {
 
     /**
      * 对结构整体进行平移
-     * @param d 平移方向
+     * @param ds 平移方向
      * @param val 平移大小
      * @return 调用者
      */
-    public Structure globalShift(Direction d, float val) {
-        return shift(cubes, d, val);
+    public Structure globalShift(float val, Direction ... ds) {
+        for (Direction d : ds) {
+            shift(cubes, val, d);
+        }
+        return this;
     }
 
     /**
@@ -38,7 +66,7 @@ public class Structure {
      * @return 调用者
      */
     public Structure globalScoop(Consumer<SeparationConfig<Cube>> op) {
-        SeparationConfig<Cube> cfg = new SeparationConfig<>();
+        SeparationConfig<Cube> cfg = new SeparationConfig<>(cubeCreateStrategy, basePoint);
         op.accept(cfg);
         for (Cube e : cubes) {
             SeparationResult<Cube> result = e.separate(cfg);
@@ -51,40 +79,115 @@ public class Structure {
     }
 
     /**
-     * 将结构沿某个方向平移，直到结构在该方向上的边缘与基准重合
+     * 将结构沿某个方向前后平移，直到结构在该方向上与基准重合
      * @param base 基准的坐标
      * @param faces 平移的方向
      * @return 调用者
      */
-    public Structure globalAlign(int base, Direction ... faces) {
+    public Structure globalAlign(float base, Direction ... faces) {
         for (Direction face : faces) {
-            float distance = face.isPositive ?
-                    base - outline[face.dim + 3] :
-                    outline[face.dim] - base;
-            globalShift(face, distance);
+            globalShift(-Math.abs(outline[face.index] - base), face);
         }
         return this;
     }
 
     /**
-     * 在坐标系中心创建一个立方体，并作为唯一的活动立方体
+     * 设置立方体创建的坐标策略，策略决定了立方体在空间中的坐标
+     * @param strategy 创建策略
+     * @return 调用者
+     */
+    public Structure cubeCreateStrategy(ICubeCreateStrategy strategy) {
+        Preconditions.checkNotNull(strategy);
+        this.cubeCreateStrategy = strategy;
+        return this;
+    }
+
+    /**
+     * 根据坐标策略（默认为{@link ICubeCreateStrategy#CENTER}）创建一个立方体，并作为唯一的活动立方体
      * @param name 立方体名字
      * @param length 立方体长度（x轴方向长度）
      * @param height 立方体高度（y轴方向长度）
      * @param width 立方体宽度（z轴方向长度）
+     * @see #cubeCreateStrategy(ICubeCreateStrategy)
      * @return 调用者
      */
     public Structure create(String name, float length, float height, float width) {
-        float x = length / 2f, y = height / 2, z = width / 2;
-        return create(name, -x, -y, -z, x, y, z);
+        Cube c = new Cube(this, name);
+        cubeCreateStrategy.set(c.data, basePoint, length, height, width);
+        return create0(c);
     }
 
     /**
-     * 在坐标系中心创建一个立方体，并作为唯一的活动立方体
+     * 根据坐标策略（默认为{@link ICubeCreateStrategy#CENTER}）创建一个立方体，并作为唯一的活动立方体
      * @see #create(String, float, float, float)
      */
     public Structure create(float length, float height, float width) {
         return create("cube" + maxId++, length, height, width);
+    }
+
+    /**
+     * 将每个活动立方体不断沿某个方向移动，直到遇到workspace边界或者其他立方体。
+     * 若立方体不在workspace内部，则会把立方体反向移动，直到与workspace边界贴在一起。
+     * 若立方体与某个立方体重合，则会把立方体反向移动，直到与立方体贴在一起
+     * @param d 移动方向
+     * @return 调用者
+     */
+    public Structure stackTo(Direction d) {
+        Set<Cube> targets = new HashSet<>(cubes);
+        active.forEach(targets::remove);
+        Direction opposite = d.opposite();
+        for (Cube c : active) {
+            Cube resCube = null;
+            float resPos = outline[opposite.index]; //一定是d方向上最小的
+            for (Cube target : targets) {
+                //是否嵌在立方体里面
+                if (!c.isSeparated(target.data)) {
+                    resCube = target;
+                    break;
+                }
+                float targetPos = target.data[opposite.index];
+                float originalPos = c.data[d.index];
+                //如果比自己的坐标还小，那肯定不是
+                if (d.larger(originalPos, targetPos)) {
+                    continue;
+                }
+                //只取第一个遇到的
+                if (resCube != null && d.larger(targetPos, resPos)) {
+                    continue;
+                }
+                //检测移动过程中c是否会撞到target
+                if (!collide(c, target, d.dim)) {
+                    continue;
+                }
+                resCube = target;
+                resPos = targetPos;
+            }
+            float original = c.data[d.index];
+            if (resCube != null) {
+                c.data[d.index] = resCube.data[opposite.index];
+                c.data[opposite.index] += c.data[d.index] - original;
+                continue;
+            }
+            //贴到workspace上
+            c.data[d.index] = workspace[d.index];
+            c.data[opposite.index] += (workspace[d.index] - original);
+        }
+        return this;
+    }
+
+    private boolean collide(Cube c, Cube target, int dim) {
+        return switch (dim) {
+            case 0 -> collide0(c, target, 1) && collide0(c, target, 2);
+            case 1 -> collide0(c, target, 0) && collide0(c, target, 2);
+            case 2 -> collide0(c, target, 0) && collide0(c, target, 1);
+            default -> false;
+        };
+    }
+
+    private boolean collide0(Cube c, Cube target, int dim) {
+        int larger = dim + 3;
+        return (c.data[dim] >= target.data[dim] && c.data[dim] < target.data[larger]) ||
+                (c.data[larger] >= target.data[dim] && c.data[larger] < target.data[larger]);
     }
 
     /**
@@ -110,12 +213,9 @@ public class Structure {
      * @return 调用者
      */
     public Structure create(String name, float x1, float y1, float z1, float x2, float y2, float z2) {
-        active.clear();
-        Cube e = new Cube(this, name);
-        e.set(x1, y1, z1, x2, y2, z2);
-        active.add(e);
-        internalAdd(e);
-        return this;
+        Cube c = new Cube(this, name);
+        c.set(x1, y1, z1, x2, y2, z2);
+        return create0(c);
     }
 
     /**
@@ -126,14 +226,37 @@ public class Structure {
         return create("cube" + maxId++, x1, y1, z1, x2, y2, z2);
     }
 
+    private Structure create0(Cube c) {
+        active.clear();
+        active.add(c);
+        internalAdd(c);
+        return this;
+    }
+
     /**
      * 对所有活动立方体进行平移
-     * @param d 方向
+     * @param ds 方向
      * @param val 大小
      * @return 调用者
      */
-    public Structure shift(Direction d, float val) {
-        return shift(active, d, val);
+    public Structure shift(float val, Direction ... ds) {
+        for (Direction d : ds) {
+            shift(active, val, d);
+        }
+        return this;
+    }
+
+    /**
+     * 将活动立方体沿某个方向前后平移，直到结构在该方向上与基准重合
+     * @param base 基准的坐标
+     * @param faces 平移的方向
+     * @return 调用者
+     */
+    public Structure align(int base, Direction ... faces) {
+        for (Direction face : faces) {
+            shift(-Math.abs(outline[face.index] - base), face);
+        }
+        return this;
     }
 
     /**
@@ -144,7 +267,7 @@ public class Structure {
     public Structure scoop(Consumer<SeparationConfig<Cube>> op) {
         List<Cube> temp = new ArrayList<>(active);
         active.clear();
-        SeparationConfig<Cube> cfg = new SeparationConfig<>();
+        SeparationConfig<Cube> cfg = new SeparationConfig<>(cubeCreateStrategy, basePoint);
         op.accept(cfg);
         for (Cube e : temp) {
             SeparationResult<Cube> result = e.separate(cfg);
@@ -176,8 +299,7 @@ public class Structure {
      * @return 调用者
      */
     public Structure findMost(Direction d) {
-        int i = d.isPositive ? d.dim + 3 : d.dim;
-        return find(c -> outline[i] == c.data[i]);
+        return find(c -> outline[d.index] == c.data[d.index]);
     }
 
     /**
@@ -198,7 +320,7 @@ public class Structure {
      * @return 坐标值
      */
     public float getOutline(Direction d) {
-        return d.isPositive ? outline[d.dim + 3] : outline[d.dim];
+        return outline[d.index];
     }
 
     /**
@@ -238,7 +360,7 @@ public class Structure {
         active.clear();
     }
 
-    private Structure shift(Collection<Cube> targets, Direction d, float val) {
+    private void shift(Collection<Cube> targets, float val, Direction d) {
         if (!d.isPositive) {
             val = -val;
         }
@@ -249,7 +371,6 @@ public class Structure {
         }
         outline[i] += val;
         outline[j] += val;
-        return this;
     }
 
     private void updateOutline(Cube b) {

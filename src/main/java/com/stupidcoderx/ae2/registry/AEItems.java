@@ -2,6 +2,7 @@ package com.stupidcoderx.ae2.registry;
 
 import com.stupidcoderx.ae2.elements.items.EntropyManipulatorItem;
 import com.stupidcoderx.ae2.elements.items.PaintBallItemDef;
+import com.stupidcoderx.ae2.elements.items.compass.CompassItemDef;
 import com.stupidcoderx.modding.element.item.SimpleItemDef;
 import com.stupidcoderx.modding.element.item.ToolItemDef;
 import com.stupidcoderx.modding.element.item.ToolType;
@@ -13,14 +14,16 @@ import java.util.function.Function;
 
 public class AEItems {
     public static final SimpleItemDef<Item> SILICON;
+    public static final CompassItemDef METEORITE_COMPASS;
 
     public static final ToolItemDef<?> FLUIX_AXE;
     public static final ToolItemDef<?> ENTROPY_MANIPULATOR;
 
     static {
         SILICON = SimpleItemDef.create("silicon", AECreativeTabs.MAIN);
+        METEORITE_COMPASS = new CompassItemDef(AECreativeTabs.MAIN);
 
-        FLUIX_AXE = tool("fluix_axe", p -> new AxeItem(ToolTypes.TOOL_TYPE_FLUIX, 6.0f, -3.1f, p));
+        FLUIX_AXE = tool("fluix_axe", p -> new AxeItem(ToolTypes.FLUIX, 6.0f, -3.1f, p));
         ENTROPY_MANIPULATOR = tool("entropy_manipulator", p -> new EntropyManipulatorItem(p.stacksTo(1)));
         PaintBallItemDef.create();
     }
@@ -31,10 +34,10 @@ public class AEItems {
     }
 
     private static class ToolTypes{
-        public static final ToolType TOOL_TYPE_FLUIX;
+        public static final ToolType FLUIX;
 
         static {
-            TOOL_TYPE_FLUIX = new ToolType(Tiers.IRON).repairIngredient(() -> AEItems.SILICON);
+            FLUIX = new ToolType(Tiers.IRON).repairIngredient(() -> AEItems.SILICON);
         }
     }
 

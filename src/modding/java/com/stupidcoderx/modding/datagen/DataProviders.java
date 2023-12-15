@@ -7,14 +7,14 @@ import com.stupidcoderx.modding.datagen.recipe.RecipeProvider;
 
 public class DataProviders {
     public static final ModelProvider MODEL_ITEM
-            = new ModelProvider("item", Mod.ITEM_REGISTRY::buildData);
+            = new ModelProvider("item", Mod.ITEM_REGISTRY::provideData);
 
     public static final ModelProvider MODEL_BLOCK
-            = new ModelProvider("block", Mod.BLOCK_REGISTRY::buildData);
+            = new ModelProvider("block", Mod.BLOCK_REGISTRY::provideData);
 
     public static final BlockStateProvider BLOCK_STATE = new BlockStateProvider();
 
-    public static final RecipeProvider RECIPE = new RecipeProvider(Mod.RECIPE_REGISTRY::buildData);
+    public static final RecipeProvider RECIPE = new RecipeProvider(Mod.RECIPE_REGISTRY::provideData);
 
     static void init() {
     }

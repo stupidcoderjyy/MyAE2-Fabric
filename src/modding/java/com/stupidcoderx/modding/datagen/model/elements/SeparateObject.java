@@ -64,7 +64,7 @@ public abstract class SeparateObject<T extends SeparateObject<T>> {
         }
     }
 
-    private boolean isSeparated(float[] r) {
+    boolean isSeparated(float[] r) {
         for (int i = 0, j = dim; i < dim; i ++, j ++) {
             if (data[i] >= r[j] || data[j] <= r[i]) {
                 return true;

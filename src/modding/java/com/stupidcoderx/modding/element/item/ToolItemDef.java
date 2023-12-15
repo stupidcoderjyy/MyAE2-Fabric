@@ -14,7 +14,7 @@ public class ToolItemDef<T extends Item> extends ItemDef<ToolItemDef<T>, T> {
     }
 
     @Override
-    protected void generateModel() {
+    protected void provideModel() {
         DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/handheld")
                 .texture("layer0", loc);

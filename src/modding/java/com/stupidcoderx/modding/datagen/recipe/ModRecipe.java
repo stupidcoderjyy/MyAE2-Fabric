@@ -2,6 +2,7 @@ package com.stupidcoderx.modding.datagen.recipe;
 
 import com.stupidcoderx.modding.util.serialize.ContainerVal;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -12,9 +13,11 @@ import net.minecraft.world.level.Level;
 public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Container> {
     public final ContainerVal root = new ContainerVal();
     private final RecipeDef<R> def;
+    private final ResourceLocation loc;
 
-    public ModRecipe(RecipeDef<R> def) {
+    public ModRecipe(ResourceLocation loc, RecipeDef<R> def) {
         this.def = def;
+        this.loc = loc;
         root.newString("type").set(def.typeLoc);
     }
 
@@ -74,5 +77,10 @@ public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Contai
     @Override
     public final RecipeType<?> getType() {
         return def.type;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return loc;
     }
 }

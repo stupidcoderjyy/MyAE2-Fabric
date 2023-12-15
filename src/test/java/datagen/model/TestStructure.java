@@ -1,6 +1,5 @@
 package datagen.model;
 
-import com.google.gson.JsonArray;
 import com.stupidcoderx.modding.datagen.model.elements.*;
 import com.stupidcoderx.modding.util.ReflectionUtil;
 import org.junit.Assert;
@@ -17,7 +16,6 @@ public class TestStructure {
                 .process(c -> c.faceAll().uv(0,0))
                 .scoop(cfg -> cfg.range(2,2,2))
                 .process(c -> {
-                    System.out.println(c);
                     Map<Direction, Face> faces = ReflectionUtil.getObjectField(c, "faces");
                     float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
                     faces.forEach((d, f) -> {
@@ -31,7 +29,6 @@ public class TestStructure {
                         };
                         Assert.assertEquals(faceArea, uvArea, 0);
                     });
-                    System.out.println(faces);
                 });
     }
 
@@ -40,24 +37,81 @@ public class TestStructure {
     }
 
     @Test
-    public void testGenWoodenTable() {
-        String oak = "minecraft:block/oak";
-        String dirt = "minecraft:block/dirt";
-        Structure struct = new Structure();
-        JsonArray json = struct
-                .create(16, 16, 16)
-                .process(c -> c.faceAll().uv(0, 0).texture(oak))
-                .scoop(config -> config
-                        .dimensionSeq(SeparationConfig.YZX)
-                        .range(12, 14, 16)
-                        .align(Direction.DOWN, struct.getOutline(Direction.DOWN)))
-                .scoop(config -> config
-                        .range(16, 14, 12)
-                        .align(Direction.DOWN, struct.getOutline(Direction.DOWN)))
-                .findMost(Direction.UP)
-                .process(c -> c.face(Direction.DOWN).texture(dirt))
-                .globalAlign(0, Direction.DOWN, Direction.NORTH, Direction.EAST)
-                .toJson();
-        System.out.println(json);
+    public void testStackToCubeSimple() {
+        new Structure(IBasePointStrategy.N_CORNER)
+                .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
+                .create(16,2,16) //干扰项（位于下层）
+                .create(2,2,2)   //干扰项（遇不到）
+                .shift(10, Direction.PZ_SOUTH)
+                .create(16,2,16)
+                .shift(2, Direction.PY_UP)
+                .create(4,4,4)
+                .shift(50, Direction.PY_UP)
+                .stackTo(Direction.NY_DOWN)
+                .process(c -> {
+                    float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
+                    Assert.assertEquals(4, data[1], 0);
+                    Assert.assertEquals(8, data[4], 0);
+                });
+    }
+
+    @Test
+    public void testStackToCubeOverlapped() {
+        new Structure(IBasePointStrategy.N_CORNER)
+                .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
+                .create(16,4,16)
+                .create(4,4,4)
+                .stackTo(Direction.NY_DOWN)
+                .process(c -> {
+                    float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
+                    Assert.assertEquals(4, data[1], 0);
+                    Assert.assertEquals(8, data[4], 0);
+                });
+    }
+
+    @Test
+    public void testStackToWorkspace() {
+        new Structure(IBasePointStrategy.N_CORNER)
+                .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
+                .create(4,4,4)
+                .shift(10, Direction.NY_DOWN)
+                .stackTo(Direction.NY_DOWN)
+                .process(c -> {
+                    float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
+                    Assert.assertEquals(0, data[1], 0);
+                    Assert.assertEquals(4, data[4], 0);
+                });
+    }
+
+    @Test
+    public void testStrategyNY() {
+        new Structure(IBasePointStrategy.NY)
+                .cubeCreateStrategy(ICubeCreateStrategy.NY)
+                .create(4,4,4)
+                .process(c -> {
+                    float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
+                    Assert.assertEquals(6, data[0], 0);
+                    Assert.assertEquals(0, data[1], 0);
+                    Assert.assertEquals(6, data[2], 0);
+                    Assert.assertEquals(10, data[3], 0);
+                    Assert.assertEquals(4, data[4], 0);
+                    Assert.assertEquals(10, data[5], 0);
+                });
+    }
+
+    @Test
+    public void testStrategyPY() {
+        new Structure(IBasePointStrategy.NY)
+                .cubeCreateStrategy(ICubeCreateStrategy.PY)
+                .create(4,4,4)
+                .process(c -> {
+                    float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
+                    Assert.assertEquals(6, data[0], 0);
+                    Assert.assertEquals(-4, data[1], 0);
+                    Assert.assertEquals(6, data[2], 0);
+                    Assert.assertEquals(10, data[3], 0);
+                    Assert.assertEquals(0, data[4], 0);
+                    Assert.assertEquals(10, data[5], 0);
+                });
     }
 }

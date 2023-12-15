@@ -59,6 +59,7 @@ dependencies {
 }
 
 loom {
+    accessWidenerPath = file("src/modding/resources/mod.accesswidener")
     runs {
         datagen {
             client()

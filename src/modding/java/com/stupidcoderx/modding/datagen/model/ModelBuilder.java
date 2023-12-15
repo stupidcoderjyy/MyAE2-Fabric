@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class ModelBuilder extends ModelFile{
     private final Map<String, ResourceLocation> textures = new HashMap<>();
+    private final Map<String, ModelTransform> transforms = new HashMap<>();
     private final String pathPrefix;
     private Structure structure;
     @Nullable
@@ -51,6 +52,11 @@ public class ModelBuilder extends ModelFile{
         return this;
     }
 
+    public ModelBuilder displayTransform(ModelTransform transform) {
+        transforms.put(transform.type, transform);
+        return this;
+    }
+
     public static ResourceLocation expandLoc(String prefix, ResourceLocation loc) {
         String path = loc.getPath();
         if (path.indexOf('/') > 0) {
@@ -73,6 +79,11 @@ public class ModelBuilder extends ModelFile{
         }
         if (structure != null) {
             root.add("elements", structure.toJson());
+        }
+        if (!transforms.isEmpty()) {
+            JsonObject displayObj = new JsonObject();
+            transforms.forEach((type, transform) -> transform.toJson(displayObj));
+            root.add("display", displayObj);
         }
         return root;
     }

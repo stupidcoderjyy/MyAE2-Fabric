@@ -1,0 +1,7 @@
+accessWidener v1 named
+
+#根据RecipeType获取全部的配方
+accessible method net/minecraft/world/item/crafting/RecipeManager byType (Lnet/minecraft/world/item/crafting/RecipeType;)Ljava/util/Map;
+
+#用于CompassBakedModel，不知道有什么用
+accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init> ()V

@@ -54,11 +54,11 @@ public abstract class ItemDef<D extends ItemDef<D, I>, I extends Item> implement
     }
 
     @Override
-    public void buildData() {
-        generateModel();
+    public void provideData() {
+        provideModel();
     }
 
-    protected void generateModel() {
+    protected void provideModel() {
         DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", loc);

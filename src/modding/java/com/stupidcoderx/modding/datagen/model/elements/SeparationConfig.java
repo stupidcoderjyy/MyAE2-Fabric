@@ -13,8 +13,12 @@ public class SeparationConfig<T extends SeparateObject<T>> {
     Consumer<SeparationResult<T>> finishedAction = r -> {};
     Map<Direction, Consumer<T>> separateActions = new EnumMap<>(Direction.class);
     boolean remove = true;
+    private final ICubeCreateStrategy strategy;
+    private final float[] base;
 
-    SeparationConfig() {
+    SeparationConfig(ICubeCreateStrategy strategy, float[] base) {
+        this.strategy = strategy;
+        this.base = base;
     }
 
     public static final int XYZ = 0x012;
@@ -42,15 +46,15 @@ public class SeparationConfig<T extends SeparateObject<T>> {
     }
 
     /**
-     * 设置切割范围，切割区域默认为坐标系中心的一个立方体
+     * 设置切割范围，切割区域的坐标策略和{@link Structure}中保持一致
      * @param length 立方体长度（x轴方向长度）
      * @param height 立方体高度（y轴方向长度）
      * @param width 立方体宽度（z轴方向长度）
      * @return 调用者
      */
     public SeparationConfig<T> range(float length, float height, float width) {
-        float x = length / 2, y = height / 2, z = width / 2;
-        return range(-x, -y, -z, x, y, z);
+        strategy.set(range, base, length, height, width);
+        return this;
     }
 
     /**
@@ -74,9 +78,7 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @return 调用者
      */
     public SeparationConfig<T> align(Direction d, float level) {
-        float distance = d.isPositive ?
-                level - range[d.dim + 3] :
-                level - range[d.dim];
+        float distance = level - range[d.index];
         range[d.dim] += distance;
         range[d.dim + 3] += distance;
         return this;
@@ -98,7 +100,7 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param distance 距离
      * @return 调用者
      */
-    public SeparationConfig<T> shift(Direction d, float distance) {
+    public SeparationConfig<T> shift(float distance, Direction d) {
         if (!d.isPositive) {
             distance = -distance;
         }

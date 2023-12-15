@@ -181,7 +181,7 @@ public class Cube extends SeparateObject<Cube> {
             if (face == null) {
                 continue;
             }
-            facesObj.add(d.name().toLowerCase(Locale.ROOT), face.toJson());
+            facesObj.add(d.id, face.toJson());
         }
         elementObj.add("faces", facesObj);
         return elementObj;
@@ -228,21 +228,23 @@ public class Cube extends SeparateObject<Cube> {
     @Override
     void onSeparated(Direction d, Cube res, float[] range) {
         this.result = res;
-        if (d.isPositive) {
-            valBig = range[d.dim + 3] - data[d.dim];
-            valSmall = data[d.dim + 3] - range[d.dim + 3];
-        } else {
-            valBig = data[d.dim + 3] - range[d.dim];
-            valSmall = range[d.dim] - data[d.dim];
-        }
+        valBig = Math.abs(range[d.dim + 3] - data[d.dim]);
+        valSmall = Math.abs(data[d.dim + 3] - range[d.dim + 3]);
+//        if (d.isPositive) {
+//            valBig = range[d.dim + 3] - data[d.dim];
+//            valSmall = data[d.dim + 3] - range[d.dim + 3];
+//        } else {
+//            valBig = data[d.dim + 3] - range[d.dim];
+//            valSmall = range[d.dim] - data[d.dim];
+//        }
 
         //对与direction垂直的四个面对应的uv进行切割，由于MC中各个面的材质坐标系不满足对称性，所以只能枚举
         switch (d.dim) {
             case 0 -> { //x
-                set(Direction.UP, d.isPositive, 0);
-                set(Direction.SOUTH, d.isPositive, 0);
-                set(Direction.DOWN, d.isPositive, 0);
-                set(Direction.NORTH, !d.isPositive, 0);
+                set(Direction.PY_UP, d.isPositive, 0);
+                set(Direction.PZ_SOUTH, d.isPositive, 0);
+                set(Direction.NY_DOWN, d.isPositive, 0);
+                set(Direction.NZ_NORTH, !d.isPositive, 0);
             }
             case 1 -> { //y
                 for (Direction vd : Direction.getVertical(d)) {
@@ -250,10 +252,10 @@ public class Cube extends SeparateObject<Cube> {
                 }
             }
             case 2 -> { //z
-                set(Direction.UP, !d.isPositive, 1);
-                set(Direction.EAST, d.isPositive, 0);
-                set(Direction.DOWN, !d.isPositive, 1);
-                set(Direction.WEST, !d.isPositive, 0);
+                set(Direction.PY_UP, !d.isPositive, 1);
+                set(Direction.PX_EAST, d.isPositive, 0);
+                set(Direction.NY_DOWN, !d.isPositive, 1);
+                set(Direction.NX_WEST, !d.isPositive, 0);
             }
         }
     }

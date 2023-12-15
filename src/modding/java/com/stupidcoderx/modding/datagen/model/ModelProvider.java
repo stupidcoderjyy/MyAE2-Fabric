@@ -1,6 +1,7 @@
 package com.stupidcoderx.modding.datagen.model;
 
 import com.google.common.base.Preconditions;
+import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.IGeneratorDataRegistry;
 import com.stupidcoderx.modding.datagen.ModDataProvider;
 import com.stupidcoderx.modding.datagen.ResourceType;
@@ -32,6 +33,14 @@ public class ModelProvider extends ModDataProvider<ModelProvider> {
         Preconditions.checkState(output != null, "generator not initialized");
         loc = ModelBuilder.expandLoc(prefix, loc);
         return models.computeIfAbsent(loc, defaultModelBuilderSupplier);
+    }
+
+    /**
+     *
+     * @see #getOrCreateModel(ResourceLocation)
+     */
+    public ModelBuilder getOrCreateModel(String loc) {
+        return getOrCreateModel(Mod.modLoc(loc));
     }
 
     @Override

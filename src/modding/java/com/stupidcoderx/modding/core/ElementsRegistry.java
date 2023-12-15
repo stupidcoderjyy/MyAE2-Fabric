@@ -1,6 +1,8 @@
 package com.stupidcoderx.modding.core;
 
 import com.google.common.base.Preconditions;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +30,16 @@ public class ElementsRegistry<T extends IRegistry> implements IRegistry {
     }
 
     @Override
-    public void buildData() {
+    public void provideData() {
         Preconditions.checkNotNull(registries, "closed: " + debugName());
-        registries.forEach(IRegistry::buildData);
+        registries.forEach(IRegistry::provideData);
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void clientRegister() {
+        Preconditions.checkNotNull(registries, "closed: " + debugName());
+        registries.forEach(IRegistry::clientRegister);
     }
 
     @Override

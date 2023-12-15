@@ -5,6 +5,8 @@ import com.stupidcoderx.ae2.util.AEColor;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.element.item.ItemDef;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -47,13 +49,13 @@ public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
     }
 
     @Override
-    public void commonRegister() {
+    @Environment(EnvType.CLIENT)
+    public void clientRegister() {
         ColorProviderRegistry.ITEM.register((stack, tint) -> calcColor(), this);
-        super.commonRegister();
     }
 
     @Override
-    protected void generateModel() {
+    protected void provideModel() {
         DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
