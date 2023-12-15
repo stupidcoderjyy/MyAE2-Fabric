@@ -1,5 +1,7 @@
-package com.stupidcoderx.modding.core;
+package com.stupidcoderx.modding.client;
 
+import com.stupidcoderx.modding.client.render.IModCustomModel;
+import com.stupidcoderx.modding.core.IRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -15,13 +17,13 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class BuiltInModelRegistry implements IRegistry, ModelResourceProvider {
-    private final Map<ResourceLocation, UnbakedModel> models = new HashMap<>();
+    private final Map<ResourceLocation, IModCustomModel> models = new HashMap<>();
     public static final BuiltInModelRegistry INSTANCE = new BuiltInModelRegistry();
 
     private BuiltInModelRegistry() {
     }
 
-    public void register(ResourceLocation loc, UnbakedModel model) {
+    public void register(ResourceLocation loc, IModCustomModel model) {
         models.put(loc, model);
     }
 

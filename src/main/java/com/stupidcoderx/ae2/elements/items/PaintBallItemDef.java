@@ -15,8 +15,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
-    private static final Map<AEColor, PaintBallItemDef> ballsNormal = new EnumMap<>(AEColor.class);
-    private static final Map<AEColor, PaintBallItemDef> ballsLumen = new EnumMap<>(AEColor.class);
     public final boolean isLumen;
     public final AEColor color;
 
@@ -24,41 +22,30 @@ public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
         super(getLoc(isLumen, color), new Item(new Item.Properties()));
         this.isLumen = isLumen;
         this.color = color;
-        if (isLumen) {
-            ballsLumen.put(color, this);
-        } else {
-            ballsNormal.put(color, this);
-        }
         creativeTab(AECreativeTabs.MAIN);
     }
 
-    public static void create() {
-        for (AEColor c : AEColor.values()) {
-            new PaintBallItemDef(false, c);
+    private static ResourceLocation getLoc(boolean isLumen, AEColor color) {
+        String name = color.id;
+        if (isLumen) {
+            name += "_lumen";
         }
-        for (AEColor c : AEColor.values()) {
-            new PaintBallItemDef(true, c);
-        }
+        name += "_paint_ball";
+        return Mod.modLoc(name);
     }
 
-    public static PaintBallItemDef get(AEColor color, boolean isLumen) {
-        if (isLumen) {
-            return ballsLumen.get(color);
+    public static Map<AEColor, PaintBallItemDef> create(boolean isLumen) {
+        Map<AEColor, PaintBallItemDef> balls = new EnumMap<>(AEColor.class);
+        for (AEColor c : AEColor.values()) {
+            balls.put(c, new PaintBallItemDef(isLumen, c));
         }
-        return ballsNormal.get(color);
+        return balls;
     }
 
     @Override
     @Environment(EnvType.CLIENT)
     public void clientRegister() {
         ColorProviderRegistry.ITEM.register((stack, tint) -> calcColor(), this);
-    }
-
-    @Override
-    protected void provideModel() {
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
-                .parent("minecraft:item/generated")
-                .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
     }
 
     private int calcColor() {
@@ -77,12 +64,10 @@ public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
         return rgb | (0xff << 24);
     }
 
-    private static ResourceLocation getLoc(boolean isLumen, AEColor color) {
-        String name = color.id;
-        if (isLumen) {
-            name += "_lumen";
-        }
-        name += "_paint_ball";
-        return Mod.modLoc(name);
+    @Override
+    protected void provideModel() {
+        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+                .parent("minecraft:item/generated")
+                .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
     }
 }

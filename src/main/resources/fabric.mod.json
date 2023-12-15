@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "ae2",
+	"id": "${id}",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "${name}",
+	"description": "${description}",
 	"authors": [
 		"Me!"
 	],

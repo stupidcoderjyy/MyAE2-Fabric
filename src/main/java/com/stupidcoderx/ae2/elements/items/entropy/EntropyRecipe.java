@@ -1,5 +1,6 @@
-package com.stupidcoderx.ae2.elements.recipes;
+package com.stupidcoderx.ae2.elements.items.entropy;
 
+import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.recipe.ModRecipe;
 import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
@@ -17,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,23 +33,46 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         super(loc, def);
     }
 
+    public boolean matches(boolean isCool, Block block, Fluid fluid) {
+        return isCool == this.isCool && (inputBlock == block || inputFluid == fluid);
+    }
+
+    public void apply(Level level, BlockPos pos) {
+        if (outputBlock != null) {
+            level.setBlock(pos, outputBlock.defaultBlockState(), 3);
+        }
+        if (outputFluid != null) {
+            level.setBlock(pos, outputFluid.defaultFluidState().createLegacyBlock(), 3);
+        }
+        if (droppedItems != null) {
+            Mod.spawnDropItems(level, pos, droppedItems);
+        }
+        SoundEvent sound = isCool ? SoundEvents.BASALT_PLACE : SoundEvents.FIRE_EXTINGUISH;
+        Mod.playGlobalSound(level, pos, sound, SoundSource.BLOCKS,
+                1.0F, 0.8F, 1.2F);
+    }
+
+    @DataGenOnly
     public EntropyRecipe cool(boolean cool) {
         root.newString("mode").set(cool ? "cool" : "heat");
         return this;
     }
 
+    @DataGenOnly
     public EntropyRecipe input(Block block) {
         setType(true, "block");
         root.newString("input").set(BuiltInRegistries.BLOCK.getKey(block));
         return this;
     }
 
+    @DataGenOnly
     public EntropyRecipe input(Fluid fluid) {
         setType(true, "fluid");
         root.newString("input").set(BuiltInRegistries.FLUID.getKey(fluid));
         return this;
     }
 
+    @DataGenOnly
     public EntropyRecipe output(ItemStack ... stacks) {
         setType(false, "item");
         ArrayVal arr = root.newArray("output");
@@ -63,17 +86,20 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         return this;
     }
 
+    @DataGenOnly
     public EntropyRecipe output(Block block) {
         setType(false, "block");
         root.newString("output").set(BuiltInRegistries.BLOCK.getKey(block));
         return this;
     }
 
+    @DataGenOnly
     public EntropyRecipe output(Fluid fluid) {
         root.newString("input").set(BuiltInRegistries.FLUID.getKey(fluid));
         return this;
     }
 
+    @DataGenOnly
     private void setType(boolean input, String type) {
         root.newString(input ? "input_type" : "output_type").set(type);
     }
@@ -125,24 +151,5 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         Item item = BuiltInRegistries.ITEM.get(Mod.loc(stackContainer.get("id").asString().get()));
         Val<?, ?> countVal = stackContainer.get("count");
         return new ItemStack(item, countVal == null ? 1 : countVal.asInt().get());
-    }
-
-    public boolean matches(boolean isCool, @NotNull Block block, @NotNull Fluid fluid) {
-        return isCool == this.isCool && (inputBlock == block || inputFluid == fluid);
-    }
-
-    public void apply(Level level, BlockPos pos) {
-        if (outputBlock != null) {
-            level.setBlock(pos, outputBlock.defaultBlockState(), 3);
-        }
-        if (outputFluid != null) {
-            level.setBlock(pos, outputFluid.defaultFluidState().createLegacyBlock(), 3);
-        }
-        if (droppedItems != null) {
-            Mod.spawnDropItems(level, pos, droppedItems);
-        }
-        SoundEvent sound = isCool ? SoundEvents.BASALT_PLACE : SoundEvents.FIRE_EXTINGUISH;
-        level.playSound(null, pos, sound, SoundSource.BLOCKS,
-                0.5f, 2.6F + (level.random.nextFloat() - level.random.nextFloat()) * 0.8F);
     }
 }

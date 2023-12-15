@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ModelBuilder extends ModelFile{
     private final Map<String, ResourceLocation> textures = new HashMap<>();
-    private final Map<String, ModelTransform> transforms = new HashMap<>();
+    private final Map<String, Display> transforms = new HashMap<>();
     private final String pathPrefix;
     private Structure structure;
     @Nullable
@@ -52,7 +52,7 @@ public class ModelBuilder extends ModelFile{
         return this;
     }
 
-    public ModelBuilder displayTransform(ModelTransform transform) {
+    public ModelBuilder display(Display transform) {
         transforms.put(transform.type, transform);
         return this;
     }

@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 /**
  * 可以储存由若干{@link Cube}组成的结构。结构拥有固定的坐标系，原点为workspace中
- * {@link Direction#NX_WEST}、{@link Direction#NY_DOWN}和{@link Direction#NZ_NORTH}
+ * {@link Direction#NX}、{@link Direction#NY}和{@link Direction#NZ}
  * 对应的三个面所交的点
  */
 public class Structure {

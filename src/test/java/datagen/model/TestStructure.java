@@ -42,12 +42,12 @@ public class TestStructure {
                 .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
                 .create(16,2,16) //干扰项（位于下层）
                 .create(2,2,2)   //干扰项（遇不到）
-                .shift(10, Direction.PZ_SOUTH)
+                .shift(10, Direction.PZ)
                 .create(16,2,16)
-                .shift(2, Direction.PY_UP)
+                .shift(2, Direction.PY)
                 .create(4,4,4)
-                .shift(50, Direction.PY_UP)
-                .stackTo(Direction.NY_DOWN)
+                .shift(50, Direction.PY)
+                .stackTo(Direction.NY)
                 .process(c -> {
                     float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
                     Assert.assertEquals(4, data[1], 0);
@@ -61,7 +61,7 @@ public class TestStructure {
                 .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
                 .create(16,4,16)
                 .create(4,4,4)
-                .stackTo(Direction.NY_DOWN)
+                .stackTo(Direction.NY)
                 .process(c -> {
                     float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
                     Assert.assertEquals(4, data[1], 0);
@@ -74,8 +74,8 @@ public class TestStructure {
         new Structure(IBasePointStrategy.N_CORNER)
                 .cubeCreateStrategy(ICubeCreateStrategy.N_CORNER)
                 .create(4,4,4)
-                .shift(10, Direction.NY_DOWN)
-                .stackTo(Direction.NY_DOWN)
+                .shift(10, Direction.NY)
+                .stackTo(Direction.NY)
                 .process(c -> {
                     float[] data = ReflectionUtil.getObjectField(SeparateObject.class, c, "data");
                     Assert.assertEquals(0, data[1], 0);

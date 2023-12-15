@@ -1,6 +1,5 @@
 package com.stupidcoderx.modding.datagen.model.elements;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -10,6 +9,7 @@ public class Face {
     final Direction direction;
     final float[] uv;
     String texture;
+    int rotateTimes = 0;
 
     Face(Direction direction) {
         this.direction = direction;
@@ -21,11 +21,6 @@ public class Face {
         uv[1] = y1;
         uv[2] = x2;
         uv[3] = y2;
-        Preconditions.checkArgument(uvValid(), "invalid uv:" + Arrays.toString(uv));
-    }
-
-    boolean uvValid() {
-        return uv[2] > uv[0] && uv[3] > uv[1];
     }
 
     void texture(String t) {
@@ -51,6 +46,9 @@ public class Face {
         JsonObject json = new JsonObject();
         json.add("uv", new Gson().toJsonTree(uv));
         json.addProperty("texture", texture);
+        if (rotateTimes % 4 != 0) {
+            json.addProperty("rotation", (rotateTimes % 4) * 90);
+        }
         return json;
     }
 

@@ -20,8 +20,8 @@ public class ChairBlock extends BaseBlock {
                 .scoop(config -> config
                         .dimensionSeq(SeparationConfig.YZX)
                         .range(12, 14, 16)
-                        .separateAction(Direction.PY_UP, c -> c.face(Direction.PY_UP).texture("#1"))
-                        .separateAction(d -> d != Direction.PY_UP, c -> c.face(Direction.PY_UP).removeFaces()))
+                        .separateAction(Direction.PY, c -> c.face(Direction.PY).texture("#1"))
+                        .separateAction(d -> d != Direction.PY, c -> c.face(Direction.PY).removeFaces()))
                 .scoop(config -> config.range(16, 14, 12))
                 .toVoxelShape();
     }

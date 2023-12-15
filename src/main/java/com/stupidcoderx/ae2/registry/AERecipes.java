@@ -1,6 +1,6 @@
 package com.stupidcoderx.ae2.registry;
 
-import com.stupidcoderx.ae2.elements.recipes.EntropyRecipe;
+import com.stupidcoderx.ae2.elements.items.entropy.EntropyRecipe;
 import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;

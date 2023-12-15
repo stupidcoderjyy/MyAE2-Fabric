@@ -11,6 +11,7 @@ public interface IRegistry {
     default void clientRegister() {
     }
 
+    @DataGenOnly
     default void provideData() {
     }
 

@@ -1,6 +1,7 @@
 package com.stupidcoderx.modding.datagen.recipe;
 
 import com.google.gson.JsonObject;
+import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.core.IRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
@@ -20,7 +21,8 @@ import java.util.function.Consumer;
 public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, RecipeSerializer<R> {
     final RecipeType<R> type;
     final ResourceLocation typeLoc;
-    final Map<ResourceLocation, Consumer<R>> recipeFactories = new HashMap<>();
+    @DataGenOnly
+    final Map<ResourceLocation, Consumer<R>> recipeFactories;
     final BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier;
 
     public RecipeDef(String typeId, BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier) {
@@ -31,12 +33,16 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
                 return typeId;
             }
         };
+        recipeFactories = Mod.isEnvDataGen ? new HashMap<>() : null;
         this.emptyRecipeSupplier = emptyRecipeSupplier;
         Mod.RECIPE_REGISTRY.add(this);
     }
 
+    @DataGenOnly
     public RecipeDef<R> register(String recipeId, Consumer<R> builder) {
-        recipeFactories.put(Mod.modLoc(typeLoc.getPath() + "/" + recipeId), builder);
+        if (Mod.isEnvDataGen) {
+            recipeFactories.put(Mod.modLoc(typeLoc.getPath() + "/" + recipeId), builder);
+        }
         return this;
     }
 
@@ -80,6 +86,7 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
         return emptyRecipeSupplier.apply(loc, this);
     }
 
+    @DataGenOnly
     R createFull(ResourceLocation loc) {
         R e = emptyRecipeSupplier.apply(loc, this);
         recipeFactories.get(loc).accept(e);

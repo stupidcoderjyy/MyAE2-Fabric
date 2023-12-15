@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
 public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Container> {
-    public final ContainerVal root = new ContainerVal();
+    protected final ContainerVal root = new ContainerVal();
     private final RecipeDef<R> def;
     private final ResourceLocation loc;
 

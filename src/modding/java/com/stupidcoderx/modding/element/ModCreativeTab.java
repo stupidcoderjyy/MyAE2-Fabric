@@ -42,7 +42,7 @@ public class ModCreativeTab implements IRegistry {
         CreativeModeTab tab = FabricItemGroup.builder()
                 .title(title)
                 .icon(() -> new ItemStack(iconSupplier.get()))
-                .displayItems(this::addDisplayItems)
+                .displayItems((p, out) -> displayItems.forEach(out::accept))
                 .build();
         var key = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Mod.modLoc(id));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, key, tab);
@@ -51,11 +51,5 @@ public class ModCreativeTab implements IRegistry {
     @Override
     public void close() {
         displayItems = null;
-    }
-
-    private void addDisplayItems(
-            CreativeModeTab.ItemDisplayParameters p,
-            CreativeModeTab.Output out) {
-        displayItems.forEach(out::accept);
     }
 }

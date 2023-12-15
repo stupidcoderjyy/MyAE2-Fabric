@@ -1,16 +1,20 @@
 package com.stupidcoderx.ae2.elements.items.compass;
 
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import com.stupidcoderx.modding.client.render.IModCustomModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,16 +27,28 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class CompassBakedModel implements BakedModel, FabricBakedModel {
-    private final BakedModel base, pointer;
+@Environment(EnvType.CLIENT)
+public class CompassModel implements IModCustomModel {
+    private static final Quaternionf ROTATOR = new Quaternionf();
+    private BakedModel base, pointer;
     private float pointerRot;
 
-    public CompassBakedModel(BakedModel base, BakedModel pointer) {
-        this.base = base;
-        this.pointer = pointer;
+    @Override
+    public Collection<ResourceLocation> getDependencies() {
+        return Set.of(CompassItemDef.BASE_LOC, CompassItemDef.POINTER_LOC);
+    }
+
+    @Nullable
+    @Override
+    public BakedModel bake(ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ResourceLocation resourceLocation) {
+        base = modelBaker.bake(CompassItemDef.BASE_LOC, modelState);
+        pointer = modelBaker.bake(CompassItemDef.POINTER_LOC, modelState);
+        return this;
     }
 
     @Override
@@ -45,13 +61,13 @@ public class CompassBakedModel implements BakedModel, FabricBakedModel {
     public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
         context.bakedModelConsumer().accept(base);
         context.pushTransform(quad -> {
-            Quaternionf quaternion = new Quaternionf().rotationY(pointerRot);
+            ROTATOR.rotationY(pointerRot);
             Vector3f pos = new Vector3f();
             for (int i = 0; i < 4; i++) {
                 quad.copyPos(i, pos);
                 //在模型坐标系中，坐标原点在左下角，需要把原点移到NY面的中央再执行旋转
                 pos.add(-0.5f, 0, -0.5f);
-                pos.rotate(quaternion);
+                pos.rotate(ROTATOR);
                 pos.add(0.5f, 0, 0.5f);
                 quad.pos(i, pos);
             }
@@ -62,33 +78,13 @@ public class CompassBakedModel implements BakedModel, FabricBakedModel {
     }
 
     @Override
-    public boolean isVanillaAdapter() {
-        return false;
-    }
-
-    @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState blockState, @Nullable Direction direction, RandomSource randomSource) {
-        return List.of();
-    }
-
-    @Override
-    public boolean useAmbientOcclusion() {
-        return false;
-    }
-
-    @Override
     public boolean isGui3d() {
         return true;
     }
 
     @Override
     public boolean usesBlockLight() {
-        return false;
-    }
-
-    @Override
-    public boolean isCustomRenderer() {
-        return false;
+        return true;
     }
 
     @Override
@@ -122,7 +118,7 @@ public class CompassBakedModel implements BakedModel, FabricBakedModel {
                     double ax = entity.getX(), az = entity.getZ();
                     int bx = pos.getX(), bz = pos.getZ();
                     float r1 = (float) Math.atan2(az - bz, bx - ax);
-                    float r2 = entity.getYRot() / 180f * Mth.PI + Mth.PI / 2;
+                    float r2 = entity.getYRot() / 180f * Mth.PI - Mth.PI / 2;
                     return r1 + r2;
                 }
             }

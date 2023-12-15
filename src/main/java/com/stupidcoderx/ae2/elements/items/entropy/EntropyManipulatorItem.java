@@ -1,6 +1,5 @@
-package com.stupidcoderx.ae2.elements.items;
+package com.stupidcoderx.ae2.elements.items.entropy;
 
-import com.stupidcoderx.ae2.elements.recipes.EntropyRecipe;
 import com.stupidcoderx.ae2.registry.AERecipes;
 import com.stupidcoderx.modding.core.Mod;
 import net.minecraft.core.BlockPos;
@@ -37,6 +36,7 @@ import java.util.List;
 public class EntropyManipulatorItem extends Item {
     private static final String CUR_POWER_NBT = "curPower";
     private static final int MAX_POWER = 50;
+    private static final int BAR_COLOR = Mth.hsvToRgb(1.0f / 3.0f, 1.0f, 1.0f);
 
     public EntropyManipulatorItem(Properties properties) {
         super(properties);
@@ -49,7 +49,7 @@ public class EntropyManipulatorItem extends Item {
 
     @Override
     public int getBarColor(ItemStack itemStack) {
-        return Mth.hsvToRgb(1.0f / 3.0f, 1.0f, 1.0f);
+        return BAR_COLOR;
     }
 
     @Override
@@ -174,9 +174,12 @@ public class EntropyManipulatorItem extends Item {
             return false;
         }
         extractPower(heldItem);
-        //如果不传入null，则播放声音的数据包不会传到自己，自己听不到声音
-        level.playSound(null, pos.relative(d), SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
-        placeBlock(level, pos, outBlock == null ? Blocks.AIR : outBlock);
+        Mod.playGlobalSound(level, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS,
+                1.0F, 0.8F, 1.2F);
+        if (outBlock == null) {
+            outBlock = Blocks.AIR;
+        }
+        level.setBlockAndUpdate(pos, outBlock.defaultBlockState());
         Mod.spawnDropItems(level, pos, outItems);
         return true;
     }
@@ -187,7 +190,8 @@ public class EntropyManipulatorItem extends Item {
             return false;
         }
         extractPower(item);
-        level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        Mod.playGlobalSound(level, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS,
+                1.0F, 0.8F, 1.2F);
         level.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
         return true;
     }
@@ -206,9 +210,5 @@ public class EntropyManipulatorItem extends Item {
 
     private void setPower(ItemStack stack, int p) {
         stack.getOrCreateTag().putInt(CUR_POWER_NBT, p);
-    }
-
-    private void placeBlock(Level level, BlockPos pos, Block block) {
-        level.setBlock(pos, block.defaultBlockState(), 3);
     }
 }

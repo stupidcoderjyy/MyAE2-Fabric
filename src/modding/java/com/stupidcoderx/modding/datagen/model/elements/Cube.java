@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 public class Cube extends SeparateObject<Cube> {
     String name;
     final Map<Direction, Face> faces = new EnumMap<>(Direction.class);
+    private boolean uvCorrect = true;
     private final List<Face> activeFaces = new ArrayList<>();
     private final Structure structure;
 
@@ -102,7 +103,7 @@ public class Cube extends SeparateObject<Cube> {
      */
     public boolean faceHasValidUV(Direction d) {
         Face face = faces.get(d);
-        return face != null && face.uvValid();
+        return face != null && uvCorrect;
     }
 
     /**
@@ -141,6 +142,30 @@ public class Cube extends SeparateObject<Cube> {
             calcFaceSize(f.direction);
             f.uv(x, y, x + tempSize[0], y + tempSize[1]);
         });
+        return this;
+    }
+
+    /**
+     * 强制设置活动面UV，但这会导致当前立方体无法被切割
+     * @param x 起始x
+     * @param y 起始y
+     * @param width uv宽度
+     * @param height uv高度
+     * @return 调用者
+     */
+    public Cube forceUv(float x, float y, float width, float height) {
+        uvCorrect = false;
+        activeFaces.forEach(f -> f.uv(x, y, x + width, y + height));
+        return this;
+    }
+
+    /**
+     * 将活动面的纹理逆时针旋转90°若干次
+     * @param times 旋转次数
+     * @return 调用者
+     */
+    public Cube rotate(int times) {
+        activeFaces.forEach(f -> f.rotateTimes = times);
         return this;
     }
 
@@ -227,35 +252,30 @@ public class Cube extends SeparateObject<Cube> {
 
     @Override
     void onSeparated(Direction d, Cube res, float[] range) {
+        Preconditions.checkState(uvCorrect, "cube with incorrect uv cannot be scooped");
         this.result = res;
         valBig = Math.abs(range[d.dim + 3] - data[d.dim]);
         valSmall = Math.abs(data[d.dim + 3] - range[d.dim + 3]);
-//        if (d.isPositive) {
-//            valBig = range[d.dim + 3] - data[d.dim];
-//            valSmall = data[d.dim + 3] - range[d.dim + 3];
-//        } else {
-//            valBig = data[d.dim + 3] - range[d.dim];
-//            valSmall = range[d.dim] - data[d.dim];
-//        }
 
         //对与direction垂直的四个面对应的uv进行切割，由于MC中各个面的材质坐标系不满足对称性，所以只能枚举
         switch (d.dim) {
             case 0 -> { //x
-                set(Direction.PY_UP, d.isPositive, 0);
-                set(Direction.PZ_SOUTH, d.isPositive, 0);
-                set(Direction.NY_DOWN, d.isPositive, 0);
-                set(Direction.NZ_NORTH, !d.isPositive, 0);
+                set(Direction.PY, d.isPositive, 0);
+                set(Direction.PZ, d.isPositive, 0);
+                set(Direction.NY, d.isPositive, 0);
+                set(Direction.NZ, !d.isPositive, 0);
             }
             case 1 -> { //y
-                for (Direction vd : Direction.getVertical(d)) {
-                    set(vd, !d.isPositive, 1);
-                }
+                set(Direction.PX, !d.isPositive, 1);
+                set(Direction.NX, !d.isPositive, 1);
+                set(Direction.PZ, !d.isPositive, 1);
+                set(Direction.NZ, !d.isPositive, 1);
             }
             case 2 -> { //z
-                set(Direction.PY_UP, !d.isPositive, 1);
-                set(Direction.PX_EAST, d.isPositive, 0);
-                set(Direction.NY_DOWN, !d.isPositive, 1);
-                set(Direction.NX_WEST, !d.isPositive, 0);
+                set(Direction.PY, !d.isPositive, 1);
+                set(Direction.PX, d.isPositive, 0);
+                set(Direction.NY, !d.isPositive, 1);
+                set(Direction.NX, !d.isPositive, 0);
             }
         }
     }
