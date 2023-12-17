@@ -23,6 +23,13 @@ public class Structure {
     private ICubeCreateStrategy cubeCreateStrategy = ICubeCreateStrategy.CENTER;
     private final float[] basePoint = new float[3];
 
+    /**
+     * 创建一个自定义空间大小、自定义基点策略的结构。空间大小影响基点坐标计算和{@link #stackTo(Direction)}的坐标计算
+     * @param basePointStrategy 基点策略。基点决定了立方体创建时的参照坐标，和{@link ICubeCreateStrategy}共同决定立方体的坐标
+     * @param xLen 空间长度
+     * @param yLen 空间高度
+     * @param zLen 空间宽度
+     */
     public Structure(IBasePointStrategy basePointStrategy, float xLen, float yLen, float zLen) {
         Preconditions.checkNotNull(basePointStrategy);
         Preconditions.checkArgument(xLen > 0);
@@ -34,10 +41,16 @@ public class Structure {
         basePointStrategy.setBasePoint(basePoint, xLen, yLen, zLen);
     }
 
+    /**
+     * @see Structure#Structure(IBasePointStrategy, float, float, float)
+     */
     public Structure(IBasePointStrategy basePointStrategy) {
         this(basePointStrategy, 16,16,16);
     }
 
+    /**
+     * @see Structure#Structure(IBasePointStrategy, float, float, float)
+     */
     public Structure() {
         this(IBasePointStrategy.CENTER);
     }

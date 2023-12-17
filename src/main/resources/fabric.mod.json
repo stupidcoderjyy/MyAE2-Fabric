@@ -18,7 +18,7 @@
 		"server": ["com.stupidcoderx.ae2.core.AEServer"],
         "fabric-datagen": ["com.stupidcoderx.modding.datagen.DataGenEntryPoint"]
     },
-	"mixins": ["modid.mixins.json"],
+	"mixins": ["internal.mixin.json", "modid.mixins.json"],
 	"depends": {
 		"fabricloader": ">=0.14.18",
 		"minecraft": "~1.20.1",

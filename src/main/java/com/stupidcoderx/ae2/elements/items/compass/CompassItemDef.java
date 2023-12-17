@@ -8,22 +8,20 @@ import com.stupidcoderx.modding.datagen.model.elements.Direction;
 import com.stupidcoderx.modding.datagen.model.elements.IBasePointStrategy;
 import com.stupidcoderx.modding.datagen.model.elements.ICubeCreateStrategy;
 import com.stupidcoderx.modding.datagen.model.elements.Structure;
-import com.stupidcoderx.modding.element.ModCreativeTab;
 import com.stupidcoderx.modding.element.item.ItemDef;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
-public class CompassItemDef extends ItemDef<CompassItemDef, Item> {
+public class CompassItemDef extends ItemDef<Item> {
     private static final String ID = "meteorite_compass";
     private static final String EXPANDED_ID = "item/" + ID;
     static final ResourceLocation BASE_LOC = Mod.modLoc(EXPANDED_ID + "_base");
     static final ResourceLocation POINTER_LOC = Mod.modLoc(EXPANDED_ID + "_pointer");
 
-    public CompassItemDef(ModCreativeTab tab) {
-        super(ID, new Item(new Item.Properties().stacksTo(1)));
-        creativeTab(tab);
+    public CompassItemDef(String name) {
+        super(ID, name, new Item(new Item.Properties().stacksTo(1)));
     }
 
     @Override

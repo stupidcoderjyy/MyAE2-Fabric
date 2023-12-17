@@ -22,48 +22,74 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 模组主类，可以继承并实现{@link net.fabricmc.api.ClientModInitializer}或者{@link net.fabricmc.api.DedicatedServerModInitializer}
+ * 作为客户端和服务端启动点
+ */
 public abstract class Mod {
-    public static final boolean isEnvDataGen = System.getProperty("fabric-api.datagen") != null;
-    public static final boolean isEnvClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     protected static List<IRegistry> registries = new ArrayList<>();
-    public static final ElementsRegistry<ItemDef<?,?>> ITEM_REGISTRY = create("item");
-    public static final ElementsRegistry<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
-    public static final ElementsRegistry<BaseBlock> BLOCK_REGISTRY = create("block");
-    public static final ElementsRegistry<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
+    /**
+     * 模组是否运行在数据生成环境中
+     */
+    public static final boolean isEnvDataGen = System.getProperty("fabric-api.datagen") != null;
+    /**
+     * 模组是否运行在客户端环境下
+     */
+    public static final boolean isEnvClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+    /**
+     * 负责注册一系列{@link ModCreativeTab}<p>
+     * 所有{@link ModCreativeTab}在初始化过程中会自动注册进此对象
+     */
+    public static final RegistryList<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
+    /**
+     * 负责注册一系列{@link ItemDef}<p>
+     * 所有{@link ItemDef}在初始化过程中会自动注册进此对象
+     */
+    public static final RegistryList<ItemDef<?>> ITEM_REGISTRY = create("item");
+    public static final RegistryList<BaseBlock> BLOCK_REGISTRY = create("block");
+    public static final RegistryList<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
     private static Mod instance;
-
     public final String modId;
-    private final Stopwatch watch = Stopwatch.createUnstarted();
 
+    /**
+     * 模组主类构造器
+     * @param modId 模组id，需要和fabric.mod.json保持一致
+     */
     protected Mod(String modId) {
         this.modId = modId;
         instance = this;
         if (isEnvClient) {
             bootstrapClient();
         }
+        ModLog.info("begin init: %s, registries: %s", modId, registries);
+        Stopwatch watch = Stopwatch.createUnstarted();
         watch.start();
         buildElements();
-        ModLog.info("build elements: %s, took %dms", modId, watch.elapsed().toMillis());
-        watch.reset();
         init();
         finishInit();
-        ModLog.info("finish init: %s", modId);
+        ModLog.info("finish init: %s, took %dms", modId, watch.elapsed().toMillis());
     }
 
+    /**
+     * 模组对象构造和注册逻辑（注册进{@link #registries}）
+     */
     protected abstract void buildElements();
 
+    /**
+     * 模组对象调用MC内部的API进行注册的逻辑
+     */
     protected void init() {
         for (IRegistry r : registries) {
-            watch.start();
             r.commonRegister();
             if (isEnvClient) {
                 r.clientRegister();
             }
-            ModLog.info("init: %s, took %dms", r.debugName(), watch.elapsed().toMillis());
-            watch.reset();
         }
     }
 
+    /**
+     * 模组加载结束，释放资源
+     */
     protected void finishInit() {
         for (IRegistry r : registries) {
             r.close();
@@ -75,24 +101,29 @@ public abstract class Mod {
         registries.add(BuiltInModelRegistry.INSTANCE);
     }
 
-    public static <T extends Mod> T getMod() {
-        return (T)instance;
-    }
-
-    public static String getModId() {
+    /**
+     * @return 模组id
+     */
+    public static String id() {
         return instance.modId;
     }
 
+    /**
+     * @return 模组资源路径
+     */
     public static ResourceLocation modLoc(String path) {
-        return new ResourceLocation(getModId(), path);
+        return new ResourceLocation(id(), path);
     }
 
+    /**
+     * @return 原版资源路径
+     */
     public static ResourceLocation loc(String path) {
         return new ResourceLocation(path);
     }
 
-    private static <T extends IRegistry> ElementsRegistry<T> create(String name) {
-        ElementsRegistry<T> r = new ElementsRegistry<>(name);
+    private static <T extends IRegistry> RegistryList<T> create(String name) {
+        RegistryList<T> r = new RegistryList<>(name);
         registries.add(r);
         return r;
     }
@@ -121,11 +152,20 @@ public abstract class Mod {
      * @param level 生成世界
      * @param pos 生成位置
      * @param drops 要掉落的物品
+     * @param keepStack 是否保留物品，如果传入false，则原先的ItemStack会被销毁
+     */
+    public static void spawnDropItems(Level level, BlockPos pos, List<ItemStack> drops, boolean keepStack) {
+        if (!level.isClientSide) {
+            drops.forEach(stack -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(),
+                    keepStack ? stack.copy() : stack));
+        }
+    }
+
+    /**
+     * @see #spawnDropItems(Level, BlockPos, List, boolean)
      */
     public static void spawnDropItems(Level level, BlockPos pos, List<ItemStack> drops) {
-        if (!level.isClientSide) {
-            drops.forEach(stack -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack));
-        }
+        spawnDropItems(level, pos, drops, false);
     }
 
     /**

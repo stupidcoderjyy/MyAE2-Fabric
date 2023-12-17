@@ -36,7 +36,8 @@ public class ContainerVal extends Val<Map<String, Field<?>>, ContainerVal>{
     }
 
     public Val<?,?> get(String key) {
-        return data.get(key).data;
+        Field<?> f = data.get(key);
+        return f == null ? null : f.data;
     }
 
     @Override

@@ -17,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
@@ -39,13 +40,16 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
 
     public void apply(Level level, BlockPos pos) {
         if (outputBlock != null) {
-            level.setBlock(pos, outputBlock.defaultBlockState(), 3);
+            level.setBlockAndUpdate(pos, outputBlock.defaultBlockState());
         }
         if (outputFluid != null) {
-            level.setBlock(pos, outputFluid.defaultFluidState().createLegacyBlock(), 3);
+            level.setBlockAndUpdate(pos, outputFluid.defaultFluidState().createLegacyBlock());
+        }
+        if (outputBlock == null && outputFluid == null) {
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
         if (droppedItems != null) {
-            Mod.spawnDropItems(level, pos, droppedItems);
+            Mod.spawnDropItems(level, pos, droppedItems, true);
         }
         SoundEvent sound = isCool ? SoundEvents.BASALT_PLACE : SoundEvents.FIRE_EXTINGUISH;
         Mod.playGlobalSound(level, pos, sound, SoundSource.BLOCKS,
@@ -78,7 +82,7 @@ public class EntropyRecipe extends ModRecipe<EntropyRecipe> {
         ArrayVal arr = root.newArray("output");
         for (ItemStack stack : stacks) {
             ContainerVal c = arr.addContainer();
-            c.newString("item").set(BuiltInRegistries.ITEM.getKey(stack.getItem()));
+            c.newString("id").set(BuiltInRegistries.ITEM.getKey(stack.getItem()));
             if (stack.getCount() > 1) {
                 c.newInt("count").set(stack.getCount());
             }

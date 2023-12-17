@@ -59,7 +59,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file("src/modding/resources/mod.accesswidener")
+    accessWidenerPath = file("src/modding/resources/internal.accesswidener")
     runs {
         datagen {
             client()
@@ -76,6 +76,8 @@ processResources {
 	filesMatching("fabric.mod.json") {
         expand "id": mod_id, "version": project.version,"name": mod_name,"description": mod_description
 	}
+
+    from('src/modding/resources')
 }
 
 jar {

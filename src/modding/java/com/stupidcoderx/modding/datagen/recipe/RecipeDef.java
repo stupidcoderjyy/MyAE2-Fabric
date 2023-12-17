@@ -18,6 +18,11 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+/**
+ * 配方容器，负责自定义配方的序列化、反序列化、注册、数据生成、游戏内获取
+ * @param <R> 配方子类
+ * @see ModRecipe
+ */
 public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, RecipeSerializer<R> {
     final RecipeType<R> type;
     final ResourceLocation typeLoc;
@@ -25,6 +30,11 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
     final Map<ResourceLocation, Consumer<R>> recipeFactories;
     final BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier;
 
+    /**
+     * 构造器
+     * @param typeId 配方类型的id
+     * @param emptyRecipeSupplier 空白配方构造器，创建一个没有任何数据的配方
+     */
     public RecipeDef(String typeId, BiFunction<ResourceLocation, RecipeDef<R>, R> emptyRecipeSupplier) {
         this.typeLoc = Mod.modLoc(typeId);
         this.type = new RecipeType<>() {
@@ -38,6 +48,12 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
         Mod.RECIPE_REGISTRY.add(this);
     }
 
+    /**
+     * 数据生成阶段构造配方对象，这个配方最终会序列化成json文件
+     * @param recipeId 配方id，仅用于文件名
+     * @param builder 配方构造器，构造的具体方法需要在{@link ModRecipe}的子类中自己实现
+     * @return 调用者
+     */
     @DataGenOnly
     public RecipeDef<R> register(String recipeId, Consumer<R> builder) {
         if (Mod.isEnvDataGen) {
@@ -46,6 +62,12 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
         return this;
     }
 
+    /**
+     * 从MC中获取本容器对应的所有配方。
+     * <p>此方法需要对{@link net.minecraft.world.item.crafting.RecipeManager#byType(RecipeType)}的访问权限进行修改
+     * @param world 任何世界
+     * @return 所有配方
+     */
     public Map<ResourceLocation, R> getRegisteredRecipes(Level world) {
         return world.getRecipeManager().byType(type);
     }

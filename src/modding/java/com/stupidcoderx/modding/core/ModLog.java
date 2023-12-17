@@ -5,8 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ModLog {
-    private static final Logger SERVER = LogManager.getFormatterLogger(Mod.getModId() + "/server");
-    private static final Logger CLIENT = LogManager.getFormatterLogger(Mod.getModId() + "/client");
+    private static final Logger SERVER = LogManager.getFormatterLogger(Mod.id() + "/server");
+    private static final Logger CLIENT = LogManager.getFormatterLogger(Mod.id() + "/client");
 
     private ModLog() {
     }

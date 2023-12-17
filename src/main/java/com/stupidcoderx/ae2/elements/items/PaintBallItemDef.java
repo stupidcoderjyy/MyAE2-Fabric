@@ -1,6 +1,5 @@
 package com.stupidcoderx.ae2.elements.items;
 
-import com.stupidcoderx.ae2.registry.AECreativeTabs;
 import com.stupidcoderx.ae2.util.AEColor;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
@@ -14,15 +13,14 @@ import net.minecraft.world.item.Item;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
+public class PaintBallItemDef extends ItemDef<Item> {
     public final boolean isLumen;
     public final AEColor color;
 
-    private PaintBallItemDef(boolean isLumen, AEColor color) {
-        super(getLoc(isLumen, color), new Item(new Item.Properties()));
+    private PaintBallItemDef(String name, boolean isLumen, AEColor color) {
+        super(getLoc(isLumen, color), name, new Item(new Item.Properties()));
         this.isLumen = isLumen;
         this.color = color;
-        creativeTab(AECreativeTabs.MAIN);
     }
 
     private static ResourceLocation getLoc(boolean isLumen, AEColor color) {
@@ -34,10 +32,10 @@ public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
         return Mod.modLoc(name);
     }
 
-    public static Map<AEColor, PaintBallItemDef> create(boolean isLumen) {
+    public static Map<AEColor, PaintBallItemDef> create(boolean isLumen, String name) {
         Map<AEColor, PaintBallItemDef> balls = new EnumMap<>(AEColor.class);
         for (AEColor c : AEColor.values()) {
-            balls.put(c, new PaintBallItemDef(isLumen, c));
+            balls.put(c, new PaintBallItemDef(name, isLumen, c));
         }
         return balls;
     }
@@ -69,5 +67,10 @@ public class PaintBallItemDef extends ItemDef<PaintBallItemDef, Item> {
         DataProviders.MODEL_ITEM.getOrCreateModel(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
+    }
+
+    @Override
+    protected String getDefaultName() {
+        return color.defaultName + this.defaultName;
     }
 }

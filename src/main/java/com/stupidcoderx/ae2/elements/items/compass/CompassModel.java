@@ -20,8 +20,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -34,9 +32,7 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class CompassModel implements IModCustomModel {
-    private static final Quaternionf ROTATOR = new Quaternionf();
     private BakedModel base, pointer;
-    private float pointerRot;
 
     @Override
     public Collection<ResourceLocation> getDependencies() {
@@ -51,23 +47,21 @@ public class CompassModel implements IModCustomModel {
         return this;
     }
 
-    @Override
-    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos,
-                               Supplier<RandomSource> randomSupplier, RenderContext context) {
-        context.bakedModelConsumer().accept(base);
-    }
+    private final Quaternionf rotator = new Quaternionf();
+    private final Vector3f pos = new Vector3f();
+    private float pointerRotation;
 
     @Override
     public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
         context.bakedModelConsumer().accept(base);
         context.pushTransform(quad -> {
-            ROTATOR.rotationY(pointerRot);
-            Vector3f pos = new Vector3f();
+            //对指南针每个面上的四个坐标进行旋转，由于指南针有4个面，故这个方法会被调用四次
+            rotator.rotationY(pointerRotation);
             for (int i = 0; i < 4; i++) {
                 quad.copyPos(i, pos);
                 //在模型坐标系中，坐标原点在左下角，需要把原点移到NY面的中央再执行旋转
                 pos.add(-0.5f, 0, -0.5f);
-                pos.rotate(ROTATOR);
+                pos.rotate(rotator);
                 pos.add(0.5f, 0, 0.5f);
                 quad.pos(i, pos);
             }
@@ -78,12 +72,34 @@ public class CompassModel implements IModCustomModel {
     }
 
     @Override
-    public boolean isGui3d() {
-        return true;
+    public ItemOverrides getOverrides() {
+        return new ItemOverrides() {
+            @Nullable
+            @Override
+            public BakedModel resolve(BakedModel bakedModel, ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
+                pointerRotation = getCompassRotation(clientLevel, livingEntity);
+                return bakedModel;
+            }
+        };
+    }
+
+    private static float getCompassRotation(ClientLevel level, LivingEntity entity) {
+        if (level != null && entity != null && level.dimensionTypeId() == BuiltinDimensionTypes.OVERWORLD) {
+            GlobalPos gPos = CompassItem.getSpawnPosition(level);
+            if (gPos != null) {
+                BlockPos pos = gPos.pos();
+                double ax = entity.getX(), az = entity.getZ();
+                int bx = pos.getX(), bz = pos.getZ();
+                float r1 = (float) Math.atan2(az - bz, bx - ax);
+                float r2 = entity.getYRot() / 180f * Mth.PI;
+                return r1 + r2 - Mth.PI / 2;
+            }
+        }
+        return (System.currentTimeMillis() % 3000) / 3000.0f * Mth.PI * 2;
     }
 
     @Override
-    public boolean usesBlockLight() {
+    public boolean isGui3d() {
         return true;
     }
 
@@ -95,38 +111,5 @@ public class CompassModel implements IModCustomModel {
     @Override
     public ItemTransforms getTransforms() {
         return this.base.getTransforms();
-    }
-
-    @Override
-    public ItemOverrides getOverrides() {
-        return new ItemOverrides() {
-            @Nullable
-            @Override
-            public BakedModel resolve(BakedModel bakedModel, ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
-                pointerRot = getCompassRotation(clientLevel, livingEntity);
-                return bakedModel;
-            }
-        };
-    }
-
-    private static float getCompassRotation(@Nullable ClientLevel level, @Nullable LivingEntity entity) {
-        if (level != null && entity != null) {
-            if (level.dimensionTypeId() == BuiltinDimensionTypes.OVERWORLD) {
-                GlobalPos gPos = CompassItem.getSpawnPosition(level);
-                if (gPos != null) {
-                    BlockPos pos = gPos.pos();
-                    double ax = entity.getX(), az = entity.getZ();
-                    int bx = pos.getX(), bz = pos.getZ();
-                    float r1 = (float) Math.atan2(az - bz, bx - ax);
-                    float r2 = entity.getYRot() / 180f * Mth.PI - Mth.PI / 2;
-                    return r1 + r2;
-                }
-            }
-        }
-
-        long timeMillis = System.currentTimeMillis();
-        // 3 seconds per full rotation
-        timeMillis %= 3000;
-        return timeMillis / 3000.f * Mth.PI * 2;
     }
 }

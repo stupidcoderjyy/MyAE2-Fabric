@@ -253,7 +253,7 @@ public class Cube extends SeparateObject<Cube> {
     @Override
     void onSeparated(Direction d, Cube res, float[] range) {
         Preconditions.checkState(uvCorrect, "cube with incorrect uv cannot be scooped");
-        this.result = res;
+        result = res;
         valBig = Math.abs(range[d.dim + 3] - data[d.dim]);
         valSmall = Math.abs(data[d.dim + 3] - range[d.dim + 3]);
 

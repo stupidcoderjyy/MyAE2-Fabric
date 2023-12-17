@@ -28,12 +28,14 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +46,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface IModCustomModel extends UnbakedModel, BakedModel, FabricBakedModel {
+public interface IModCustomModel extends UnbakedModel, BakedModel, FabricBakedModel{
     /**
      * @return 本模型（以及其模型依赖，依赖的依赖，等）依赖的纹理
      */
@@ -53,12 +55,6 @@ public interface IModCustomModel extends UnbakedModel, BakedModel, FabricBakedMo
         return Collections.emptyList();
     }
 
-    /**
-     * @see FabricBakedModel#emitItemQuads(ItemStack, Supplier, RenderContext)
-     * @see #getOverrides()
-     */
-    @Override
-    void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context);
 
     @Override
     default void resolveParents(Function<ResourceLocation, UnbakedModel> function) {
@@ -68,13 +64,24 @@ public interface IModCustomModel extends UnbakedModel, BakedModel, FabricBakedMo
     }
 
     /**
-     * @return 获得模型使用的变换（如平移、旋转、缩放），模型文件里面的变换这是这个
-     *
+     * 如果添加了钠模组，则必须同时添加铟模组，否则此方法无效
+     * @see FabricBakedModel#emitItemQuads(ItemStack, Supplier, RenderContext)
+     * @see #getOverrides()
      */
     @Override
-    ItemTransforms getTransforms();
+    default void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
+    }
 
     /**
+     * 如果添加了钠模组，则必须同时添加铟模组，否则此方法无效
+     * @see FabricBakedModel#emitBlockQuads(BlockAndTintGetter, BlockState, BlockPos, Supplier, RenderContext)
+     */
+    @Override
+    default void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
+    }
+
+    /**
+     * 如果添加了钠模组，则必须同时添加铟模组，否则此方法无效
      * @return 使用FabricApi进行加载时，返回false
      */
     @Override
@@ -138,6 +145,13 @@ public interface IModCustomModel extends UnbakedModel, BakedModel, FabricBakedMo
      */
     @Override
     ItemOverrides getOverrides();
+
+    /**
+     * @return 获得模型使用的变换（如平移、旋转、缩放），模型文件里面的变换这是这个
+     *
+     */
+    @Override
+    ItemTransforms getTransforms();
 
     /**
      * @return 粒子应使用的任何纹理。对于方块，它将在实体掉落在其上或其被破坏时显示。

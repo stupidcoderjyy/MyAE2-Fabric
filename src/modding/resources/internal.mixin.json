@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "com.stupidcoderx.modding.mixin",
+  "compatibilityLevel": "JAVA_11",
+  "mixins": [
+      "EnchantmentHelperMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

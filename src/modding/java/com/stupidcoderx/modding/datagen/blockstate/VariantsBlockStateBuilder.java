@@ -14,6 +14,12 @@ public class VariantsBlockStateBuilder implements IBlockStateBuilder{
     final Map<String, VariantType> nameToTypes = new HashMap<>();
     private IStateModelCondition condition;
 
+    /**
+     * 添加一个状态变量
+     * @param name 变量名
+     * @param options 变量的所有可能值
+     * @return 调用者
+     */
     public VariantsBlockStateBuilder variant(String name, List<String> options) {
         Preconditions.checkArgument(options.size() > 0, "empty options");
         VariantType type = new VariantType(maxTypeId++, name, options);
@@ -22,10 +28,19 @@ public class VariantsBlockStateBuilder implements IBlockStateBuilder{
         return this;
     }
 
+    /**
+     * 添加面的状态变量
+     * @return 调用者
+     */
     public VariantsBlockStateBuilder variantFace() {
         return variant("face", List.of("north", "south", "top", "bottom", "east", "west"));
     }
 
+    /**
+     * 设置获取模型属性的逻辑，这决定了每个状态下的方块模型
+     * @param p 根据变量值获取模型属性的逻辑
+     * @return 调用者
+     */
     public VariantsBlockStateBuilder condition(IStateModelCondition p) {
         this.condition = p;
         return this;

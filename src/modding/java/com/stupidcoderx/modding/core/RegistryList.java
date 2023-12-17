@@ -7,16 +7,12 @@ import net.fabricmc.api.Environment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElementsRegistry<T extends IRegistry> implements IRegistry {
+public class RegistryList<T extends IRegistry> implements IRegistry {
     private List<T> registries = new ArrayList<>();
     private final String name;
 
-    public ElementsRegistry(String name) {
+    public RegistryList(String name) {
         this.name = name;
-    }
-
-    public ElementsRegistry() {
-        this.name = this.getClass().getName();
     }
 
     public void add(T obj) {

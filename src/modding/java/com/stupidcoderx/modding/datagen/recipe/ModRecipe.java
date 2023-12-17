@@ -10,6 +10,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
+/**
+ * 模组配方，需要实现两个功能：
+ * <p>1）数据生成阶段的配方构造（对{@link ContainerVal}进行构造），用于生成json文件；
+ * <p>2）游戏加载阶段从{@link ContainerVal}解析配方数据的逻辑
+ * @param <R> 配方子类，便于链式调用
+ */
 public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Container> {
     protected final ContainerVal root = new ContainerVal();
     private final RecipeDef<R> def;
@@ -80,7 +86,7 @@ public abstract class ModRecipe<R extends ModRecipe<R>> implements Recipe<Contai
     }
 
     @Override
-    public ResourceLocation getId() {
+    public final ResourceLocation getId() {
         return loc;
     }
 }

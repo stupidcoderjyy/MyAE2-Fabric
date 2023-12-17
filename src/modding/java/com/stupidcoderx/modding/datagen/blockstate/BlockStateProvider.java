@@ -1,6 +1,5 @@
 package com.stupidcoderx.modding.datagen.blockstate;
 
-import com.google.common.base.Preconditions;
 import com.stupidcoderx.modding.datagen.ModDataProvider;
 import com.stupidcoderx.modding.datagen.ResourceType;
 import net.minecraft.data.CachedOutput;
@@ -14,12 +13,16 @@ public class BlockStateProvider extends ModDataProvider<BlockStateProvider> {
     private final Map<ResourceLocation, IBlockStateBuilder> stateBuilders = new HashMap<>();
 
     public BlockStateProvider() {
-        super(ResourceType.BLOCK_STATE, () -> {});
+        super(ResourceType.BLOCK_STATE);
     }
 
+    /**
+     * 创建一个枚举方块状态文件。枚举方块状态文件定义了方块所有属性的所有可能情况
+     * @param loc 方块资源路径
+     * @return 构造器
+     */
     public VariantsBlockStateBuilder variants(ResourceLocation loc) {
-        Preconditions.checkArgument(!stateBuilders.containsKey(loc),
-                "block state builder for " + loc + " already exists");
+        ensureUnlocked();
         var builder = new VariantsBlockStateBuilder();
         stateBuilders.put(loc, builder);
         return builder;

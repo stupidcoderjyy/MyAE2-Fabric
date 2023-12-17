@@ -3,47 +3,37 @@ package com.stupidcoderx.ae2.registry;
 import com.stupidcoderx.ae2.elements.items.PaintBallItemDef;
 import com.stupidcoderx.ae2.elements.items.compass.CompassItemDef;
 import com.stupidcoderx.ae2.elements.items.entropy.EntropyManipulatorItem;
+import com.stupidcoderx.ae2.elements.items.vanillatools.FluixAxe;
+import com.stupidcoderx.ae2.elements.items.vanillatools.FluixPickaxe;
 import com.stupidcoderx.ae2.util.AEColor;
-import com.stupidcoderx.modding.element.item.SimpleItemDef;
-import com.stupidcoderx.modding.element.item.ToolItemDef;
-import com.stupidcoderx.modding.element.item.ToolType;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Tiers;
+import com.stupidcoderx.modding.element.item.ItemDef;
+import net.minecraft.world.item.CreativeModeTabs;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public class AEItems {
-    public static final SimpleItemDef<Item> SILICON, FLUIX_CRYSTAL;
+    public static final ItemDef<?> SILICON, FLUIX_CRYSTAL;
     public static final CompassItemDef METEORITE_COMPASS;
     public static final Map<AEColor, PaintBallItemDef> PAINT_BALLS, LUMEN_PAINT_BALLS;
 
-    public static final ToolItemDef<?> FLUIX_AXE;
-    public static final ToolItemDef<?> ENTROPY_MANIPULATOR;
+    public static final ItemDef<?> FLUIX_AXE, FLUIX_PICKAXE;
+    public static final ItemDef<?> ENTROPY_MANIPULATOR;
 
     static {
-        SILICON = SimpleItemDef.create("silicon", AECreativeTabs.MAIN);
-        FLUIX_CRYSTAL = SimpleItemDef.create("fluix_crystal", AECreativeTabs.MAIN);
-        PAINT_BALLS = PaintBallItemDef.create(false);
-        LUMEN_PAINT_BALLS = PaintBallItemDef.create(true);
-        METEORITE_COMPASS = new CompassItemDef(AECreativeTabs.MAIN);
+        ItemDef.pushTab(AECreativeTabs.MAIN);
+        SILICON = ItemDef.simple("silicon", "硅");
+        FLUIX_CRYSTAL = ItemDef.simple("fluix_crystal", "Fluix水晶");
+        PAINT_BALLS = PaintBallItemDef.create(false, "染色球");
+        LUMEN_PAINT_BALLS = PaintBallItemDef.create(true, "光通染色球");
+        METEORITE_COMPASS = new CompassItemDef("陨石罗盘");
 
-        FLUIX_AXE = tool("fluix_axe", p -> new AxeItem(ToolTypes.FLUIX, 6.0f, -3.1f, p));
-        ENTROPY_MANIPULATOR = tool("entropy_manipulator", p -> new EntropyManipulatorItem(p.stacksTo(1)));
-    }
+        ItemDef.pushTab(CreativeModeTabs.TOOLS_AND_UTILITIES);
+        FLUIX_AXE = ItemDef.tool("fluix_axe", "Fluix斧头", p -> new FluixAxe( 6.0f, -3.1f, p));
+        FLUIX_PICKAXE = ItemDef.tool("fluix_pickaxe", "Fluix镐子", p -> new FluixPickaxe(1, -2.8F, p));
+        ItemDef.popTab();
 
-    private static <T extends Item> ToolItemDef<T> tool(String id, Function<Item.Properties, T> itemBuilder) {
-        T item = itemBuilder.apply(new Item.Properties());
-        return new ToolItemDef<>(id, item).creativeTab(AECreativeTabs.TOOLS);
-    }
-
-    private static class ToolTypes{
-        public static final ToolType FLUIX;
-
-        static {
-            FLUIX = new ToolType(Tiers.IRON).repairIngredient(() -> AEItems.FLUIX_CRYSTAL);
-        }
+        ENTROPY_MANIPULATOR = ItemDef.tool("entropy_manipulator", "熵变机械臂", p -> new EntropyManipulatorItem(p.stacksTo(1)));
+        ItemDef.popTab();
     }
 
     public static void build() {
