@@ -66,6 +66,9 @@ loom {
             property "fabric-api.datagen"
             property "fabric-api.datagen.output-dir", file("src/generated/resources").absolutePath
         }
+        client {
+            programArgs "--username", "${player_name}"
+        }
     }
 }
 

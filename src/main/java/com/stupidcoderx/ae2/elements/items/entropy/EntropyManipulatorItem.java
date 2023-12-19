@@ -109,19 +109,19 @@ public class EntropyManipulatorItem extends Item {
     private boolean tryApplyEffect(Level level, ItemStack stack, BlockPos pos, Player player, Direction face) {
         Block block = level.getBlockState(pos).getBlock();
         boolean cool = player.isShiftKeyDown();
-        if (tryApplyEntropyRecipes(cool, level, stack, block, pos, player)) {
+        if (tryApplyEntropyRecipes(cool, level, stack, block, pos)) {
             return true;
         }
         if (cool) {
             return false;
         }
-        if (tryApplySmeltingRecipes(stack, level, player, pos, face)) {
+        if (tryApplySmeltingRecipes(stack, level, player, pos)) {
             return true;
         }
         return trySpawnFire(level, stack, pos, face);
     }
 
-    private boolean tryApplyEntropyRecipes(boolean cool, Level level, ItemStack stack, Block block, BlockPos pos, Player p) {
+    private boolean tryApplyEntropyRecipes(boolean cool, Level level, ItemStack stack, Block block, BlockPos pos) {
         EntropyRecipe recipe = findRecipe(cool, level, block, level.getFluidState(pos).getType());
         if (recipe == null) {
             return false;
@@ -140,7 +140,7 @@ public class EntropyManipulatorItem extends Item {
         return null;
     }
 
-    private boolean tryApplySmeltingRecipes(ItemStack heldItem, Level level, Player p, BlockPos pos, Direction d) {
+    private boolean tryApplySmeltingRecipes(ItemStack heldItem, Level level, Player p, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         BlockEntity be = level.getBlockEntity(pos);
         //获取方块掉落物

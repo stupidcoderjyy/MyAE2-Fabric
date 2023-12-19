@@ -52,15 +52,15 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
     /**
      * 创建一个默认的物品
      * @param id 物品id
-     * @param defaultName 物品默认本地化名称
+     * @param name 物品默认本地化名称
      * @return 物品容器
      */
-    public static ItemDef<Item> simple(String id, String defaultName) {
-        return new ItemDef<>(id, defaultName, new Item(new Item.Properties()));
+    public static ItemDef<Item> simple(String id, String name) {
+        return new ItemDef<>(id, name, new Item(new Item.Properties()));
     }
 
     /**
-     * 创建一个模型继承于"minecraft:item/handheld"的物品
+     * 创建一个模型继承于"minecraft:item/handheld"，且最大堆叠数为1的物品
      * @param id 物品id
      * @param name 物品默认本地化名称
      * @param factory 物品构造器
@@ -68,7 +68,7 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
      * @param <T> 工具类
      */
     public static <T extends Item> ItemDef<T> tool(String id, String name, Function<Item.Properties, T> factory) {
-        return withModelPrefix(Mod.modLoc(id), name, factory.apply(new Item.Properties()), "handheld");
+        return withModelPrefix(Mod.modLoc(id), name, factory.apply(new Item.Properties().stacksTo(1)), "handheld");
     }
 
     @Override
