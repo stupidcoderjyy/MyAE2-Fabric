@@ -2,6 +2,8 @@ package com.stupidcoderx.modding.datagen.blockstate;
 
 import com.stupidcoderx.modding.datagen.ModDataProvider;
 import com.stupidcoderx.modding.datagen.ResourceType;
+import com.stupidcoderx.modding.datagen.blockstate.multipart.MultiPartBlockStateBuilder;
+import com.stupidcoderx.modding.datagen.blockstate.variants.VariantsBlockStateBuilder;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.resources.ResourceLocation;
 
@@ -10,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class BlockStateProvider extends ModDataProvider<BlockStateProvider> {
-    private final Map<ResourceLocation, IBlockStateBuilder> stateBuilders = new HashMap<>();
+    private final Map<ResourceLocation, IBuilderElement> stateBuilders = new HashMap<>();
 
     public BlockStateProvider() {
         super(ResourceType.BLOCK_STATE);
@@ -24,6 +26,13 @@ public class BlockStateProvider extends ModDataProvider<BlockStateProvider> {
     public VariantsBlockStateBuilder variants(ResourceLocation loc) {
         ensureUnlocked();
         var builder = new VariantsBlockStateBuilder();
+        stateBuilders.put(loc, builder);
+        return builder;
+    }
+
+    public MultiPartBlockStateBuilder multipart(ResourceLocation loc) {
+        ensureUnlocked();
+        var builder = new MultiPartBlockStateBuilder();
         stateBuilders.put(loc, builder);
         return builder;
     }

@@ -3,7 +3,6 @@ package com.stupidcoderx.modding.core;
 import com.google.common.base.Stopwatch;
 import com.stupidcoderx.modding.client.BuiltInModelRegistry;
 import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
-import com.stupidcoderx.modding.element.BaseBlock;
 import com.stupidcoderx.modding.element.ModCreativeTab;
 import com.stupidcoderx.modding.element.item.ItemDef;
 import com.stupidcoderx.modding.util.DimensionalBlockPos;
@@ -45,8 +44,7 @@ public abstract class Mod {
      * 负责注册一系列{@link ItemDef}<p>
      * 所有{@link ItemDef}在初始化过程中会自动注册进此对象
      */
-    public static final RegistryList<ItemDef<?>> ITEM_REGISTRY = create("item");
-    public static final RegistryList<BaseBlock> BLOCK_REGISTRY = create("block");
+    public static final RegistryList<ItemDef<?>> ITEM_LIKE_REGISTRY = create("item");
     public static final RegistryList<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
     private static Mod instance;
     public final String modId;
@@ -120,6 +118,14 @@ public abstract class Mod {
      */
     public static ResourceLocation loc(String path) {
         return new ResourceLocation(path);
+    }
+
+    public static ResourceLocation expandLoc(String prefix, ResourceLocation loc) {
+        String path = loc.getPath();
+        if (path.indexOf('/') > 0) {
+            return loc;
+        }
+        return new ResourceLocation(loc.getNamespace(), prefix + "/" + path);
     }
 
     private static <T extends IRegistry> RegistryList<T> create(String name) {

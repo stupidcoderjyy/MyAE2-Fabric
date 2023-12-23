@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.datagen.model;
 
+import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.ModDataProvider;
 import com.stupidcoderx.modding.datagen.ResourceType;
 import net.minecraft.data.CachedOutput;
@@ -22,7 +23,7 @@ public class ModelProvider extends ModDataProvider<ModelProvider> {
     }
 
     public ModelBuilder getOrCreateModel(ResourceLocation loc) {
-        loc = ModelBuilder.expandLoc(prefix, loc);
+        loc = Mod.expandLoc(prefix, loc);
         return models.computeIfAbsent(loc, defaultModelBuilderSupplier);
     }
 

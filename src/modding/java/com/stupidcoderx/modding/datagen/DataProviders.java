@@ -4,6 +4,8 @@ import com.stupidcoderx.modding.datagen.blockstate.BlockStateProvider;
 import com.stupidcoderx.modding.datagen.lang.LocalizationProvider;
 import com.stupidcoderx.modding.datagen.model.ModelProvider;
 import com.stupidcoderx.modding.datagen.recipe.RecipeProvider;
+import com.stupidcoderx.modding.datagen.tag.BlockTag;
+import com.stupidcoderx.modding.datagen.tag.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -34,6 +36,8 @@ public class DataProviders {
     public static final RecipeProvider RECIPE = new RecipeProvider();
 
     public static final LocalizationProvider LOCALIZATION = new LocalizationProvider("zh_cn");
+
+    public static final TagsProvider<BlockTag> BLOCK_TAGS = new TagsProvider<>("blocks", BlockTag::new);
 
     static void init() {
     }

@@ -9,7 +9,8 @@ public enum ResourceType {
     MODEL(PackOutput.Target.RESOURCE_PACK, ".json", "models"),
     BLOCK_STATE(PackOutput.Target.RESOURCE_PACK, ".json", "blockstates"),
     LANG(PackOutput.Target.RESOURCE_PACK, ".json", "lang"),
-    RECIPE(PackOutput.Target.DATA_PACK, ".json", "recipes")
+    RECIPE(PackOutput.Target.DATA_PACK, ".json", "recipes"),
+    TAG(PackOutput.Target.DATA_PACK, ".json", "tags")
     ;
     public final PackOutput.Target type;
     public final String pathSuffix;

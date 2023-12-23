@@ -32,7 +32,7 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
         this.item = item;
         this.loc = loc;
         this.defaultName = name;
-        Mod.ITEM_REGISTRY.add(this);
+        Mod.ITEM_LIKE_REGISTRY.add(this);
         TABS.forEach(this::handleTab);
     }
 

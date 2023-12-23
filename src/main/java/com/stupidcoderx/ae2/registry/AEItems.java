@@ -25,7 +25,7 @@ public class AEItems {
         PAINT_BALLS = PaintBallItemDef.create(false, "染色球");
         LUMEN_PAINT_BALLS = PaintBallItemDef.create(true, "光通染色球");
         METEORITE_COMPASS = new CompassItemDef("陨石罗盘");
-        FLUIX_AXE = ItemDef.tool("fluix_axe", "Fluix斧头", p -> new FluixAxe( 6.0f, -3.1f, p));
+        FLUIX_AXE = ItemDef.tool("fluix_axe", "Fluix斧头", p -> new FluixAxe(6, -3.1f, p));
         FLUIX_PICKAXE = ItemDef.tool("fluix_pickaxe", "Fluix镐子", p -> new FluixPickaxe(1, -2.8F, p));
         ENTROPY_MANIPULATOR = ItemDef.tool("entropy_manipulator", "熵变机械臂", EntropyManipulatorItem::new);
         ItemDef.popTab();

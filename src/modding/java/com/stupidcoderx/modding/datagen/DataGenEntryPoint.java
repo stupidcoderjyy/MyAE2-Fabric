@@ -20,8 +20,7 @@ public class DataGenEntryPoint implements DataGeneratorEntrypoint {
      * 数据构造
      */
     protected void provideData() {
-        Mod.ITEM_REGISTRY.provideData();
-        Mod.BLOCK_REGISTRY.provideData();
+        Mod.ITEM_LIKE_REGISTRY.provideData();
         Mod.RECIPE_REGISTRY.provideData();
         Mod.CREATIVE_TAB_REGISTRY.provideData();
     }

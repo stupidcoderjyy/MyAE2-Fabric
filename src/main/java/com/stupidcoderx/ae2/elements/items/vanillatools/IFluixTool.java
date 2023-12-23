@@ -8,6 +8,6 @@ import net.minecraft.world.item.enchantment.Enchantments;
 interface IFluixTool extends IIntrinsicEnchantItem {
     @Override
     default int getIntrinsicEnchantLevel(ItemStack stack, Enchantment enchantment) {
-        return enchantment == Enchantments.BLOCK_FORTUNE ? 3 : 0;
+        return enchantment == Enchantments.BLOCK_FORTUNE ? 10 : 0;
     }
 }

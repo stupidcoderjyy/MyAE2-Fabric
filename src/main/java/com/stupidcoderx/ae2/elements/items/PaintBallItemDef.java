@@ -48,10 +48,10 @@ public class PaintBallItemDef extends ItemDef<Item> {
 
     private int calcColor() {
         int rgb = color.rgbNormal;
-        int r = rgb >> 16 & 0xff;
-        int g = rgb >> 8 & 0xff;
-        int b = rgb & 0xff;
         if (isLumen) {
+            int r = rgb >> 16 & 0xff;
+            int g = rgb >> 8 & 0xff;
+            int b = rgb & 0xff;
             //略微提升亮度
             float fail = 0.7f;
             float full = 0xff * 0.3f;
@@ -59,7 +59,7 @@ public class PaintBallItemDef extends ItemDef<Item> {
                     | (int)(full + g * fail) << 8
                     | (int)(full + b * fail);
         }
-        return rgb | (0xff << 24);
+        return rgb;
     }
 
     @Override

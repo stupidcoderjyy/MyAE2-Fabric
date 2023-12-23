@@ -1,14 +1,15 @@
-package com.stupidcoderx.modding.datagen.blockstate;
+package com.stupidcoderx.modding.datagen.blockstate.variants;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
+import com.stupidcoderx.modding.datagen.blockstate.IBuilderElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VariantsBlockStateBuilder implements IBlockStateBuilder{
+public class VariantsBlockStateBuilder implements IBuilderElement {
     private int maxTypeId = 0;
     final List<VariantType> idToTypes = new ArrayList<>();
     final Map<String, VariantType> nameToTypes = new HashMap<>();
@@ -33,7 +34,7 @@ public class VariantsBlockStateBuilder implements IBlockStateBuilder{
      * @return 调用者
      */
     public VariantsBlockStateBuilder variantFace() {
-        return variant("face", List.of("north", "south", "top", "bottom", "east", "west"));
+        return variant("face", List.of("east", "south", "west", "north", "top", "down"));
     }
 
     /**
@@ -51,7 +52,7 @@ public class VariantsBlockStateBuilder implements IBlockStateBuilder{
         JsonObject rootObj = new JsonObject();
         JsonObject variantsObj = new JsonObject();
         rootObj.add("variants", variantsObj);
-        VariantsState state = new VariantsState(this, new String[maxTypeId]);
+        VariantsState state = new VariantsState(this, new String[maxTypeId], new int[maxTypeId]);
         if (maxTypeId == 0) {
             addStateBranch(variantsObj, state);
         } else {
@@ -65,8 +66,11 @@ public class VariantsBlockStateBuilder implements IBlockStateBuilder{
 
     private void recurseTest(JsonObject variantsObj, VariantsState state, int curType) {
         boolean recurse = curType + 1 < maxTypeId;
-        for (String option : idToTypes.get(curType).options) {
+        List<String> options = idToTypes.get(curType).options;
+        for (int i = 0; i < options.size(); i++) {
+            String option = options.get(i);
             state.properties[curType] = option;
+            state.optionIndex[curType] = i;
             if (recurse) {
                 recurseTest(variantsObj, state, curType + 1);
             }

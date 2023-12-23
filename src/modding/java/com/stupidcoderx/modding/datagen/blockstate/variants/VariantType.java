@@ -1,4 +1,4 @@
-package com.stupidcoderx.modding.datagen.blockstate;
+package com.stupidcoderx.modding.datagen.blockstate.variants;
 
 import java.util.List;
 

@@ -1,24 +1,46 @@
-package com.stupidcoderx.modding.datagen.blockstate;
+package com.stupidcoderx.modding.datagen.blockstate.variants;
 
 import com.google.common.base.Preconditions;
 
 public class VariantsState {
     final String[] properties;
+    final int[] optionIndex;
     private final VariantsBlockStateBuilder parent;
 
-    VariantsState(VariantsBlockStateBuilder parent, String[] properties) {
+    VariantsState(VariantsBlockStateBuilder parent, String[] properties, int[] optionIndex) {
         this.properties = properties;
         this.parent = parent;
+        this.optionIndex = optionIndex;
     }
 
+    /**
+     * 根据变量名获取当前值
+     * @param key 变量名
+     * @return 当前值
+     */
     public String getVal(String key) {
         VariantType type = parent.nameToTypes.get(key);
         return properties[type.id];
     }
 
+    /**
+     * 根据变量id获取当前值
+     * @param typeId 变量id，由变量添加顺序决定
+     * @return 当前的值
+     */
     public String getVal(int typeId) {
         Preconditions.checkElementIndex(typeId, properties.length);
         return properties[typeId];
+    }
+
+    /**
+     * 根据变量id获取当前值在选项列表中的索引
+     * @param typeId 变量id，由变量添加顺序决定
+     * @return 当前值在选项列表中的索引
+     */
+    public int optionIndex(int typeId) {
+        Preconditions.checkElementIndex(typeId, properties.length);
+        return optionIndex[typeId];
     }
 
     @Override
