@@ -4,6 +4,7 @@ import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
+import com.stupidcoderx.modding.datagen.model.ModelBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SlabBlock;
 
@@ -33,15 +34,15 @@ public class SlabBlockDef extends ExtendedBlockDef<SlabBlock> {
 
     @Override
     @DataGenOnly
-    protected void provideBlockModel() {
+    protected ModelBuilder provideBlockModel() {
         ResourceLocation top = getBaseBlockTexture("top", "top", "end", "all");
         ResourceLocation side = getBaseBlockTexture("side", "side", "all");
         ResourceLocation bottom = getBaseBlockTexture("bottom", "bottom", "end", "all");
-        DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
-                .parent("block/slab")
-                .texture("top", top).texture("side", side).texture("bottom", bottom);
         DataProviders.MODEL_BLOCK.getOrCreateModel(locTop)
                 .parent("block/slab_top")
+                .texture("top", top).texture("side", side).texture("bottom", bottom);
+        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
+                .parent("block/slab")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
     }
 }

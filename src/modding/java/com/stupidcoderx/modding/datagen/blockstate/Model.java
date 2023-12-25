@@ -15,6 +15,10 @@ public class Model {
         this.path = Mod.expandLoc("block", path);
     }
 
+    public Model(String path) {
+        this.path = Mod.expandLoc("block", Mod.modLoc(path));
+    }
+
     public Model rotationX(int times) {
         rotation[0] = (times % 4) * 90;
         return this;

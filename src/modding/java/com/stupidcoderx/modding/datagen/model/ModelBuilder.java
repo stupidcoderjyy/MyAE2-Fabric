@@ -15,6 +15,7 @@ public class ModelBuilder extends ModelFile{
     private final Map<String, Display> transforms = new HashMap<>();
     private final String pathPrefix;
     private Structure structure;
+    private ResourceLocation loaderLoc;
     @Nullable
     private ModelFile parent;
 
@@ -33,8 +34,8 @@ public class ModelBuilder extends ModelFile{
         return this;
     }
 
-    public ModelBuilder parent(String loc) {
-        return parent(new ResourceLocation(loc));
+    public ModelBuilder parent(String fullLoc) {
+        return parent(new ResourceLocation(fullLoc));
     }
 
     public ModelBuilder texture(String key, ResourceLocation loc) {
@@ -58,8 +59,17 @@ public class ModelBuilder extends ModelFile{
         return this;
     }
 
+    public ModelBuilder loader(String loaderPath) {
+        this.loaderLoc = Mod.modLoc(loaderPath);
+        return this;
+    }
+
     protected JsonObject toJson() {
         JsonObject root = new JsonObject();
+        if (loaderLoc != null) {
+            root.addProperty("loader", loaderLoc.toString());
+            return root;
+        }
         if (parent != null) {
             root.addProperty("parent", parent.location.toString());
         }

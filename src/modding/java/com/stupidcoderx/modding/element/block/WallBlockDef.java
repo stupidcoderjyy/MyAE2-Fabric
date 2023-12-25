@@ -26,7 +26,7 @@ public class WallBlockDef extends ExtendedBlockDef<WallBlock> {
     @DataGenOnly
     public void provideData() {
         super.provideData();
-        DataProviders.BLOCK_TAGS.of(BlockTags.WALLS).add(block).replaceVanilla(true);
+        DataProviders.BLOCK_TAGS.of(BlockTags.WALLS).add(block).replaceVanilla(false);
     }
 
     @Override

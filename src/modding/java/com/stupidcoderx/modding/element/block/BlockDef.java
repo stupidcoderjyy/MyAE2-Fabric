@@ -13,15 +13,16 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Stack;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
-    private static final Stack<BlockBehaviour.Properties> PROPERTIES = new Stack<>();
+    private static final BlockPropertyManager bpManager = new BlockPropertyManager();
     public final B block;
     @DataGenOnly
-    ModelBuilder mbBlock;
+    protected ModelBuilder mbBlock;
 
     public BlockDef(ResourceLocation loc, String name, B block, Item.Properties p) {
         super(loc, name, new BlockItem(block, p));
@@ -61,15 +62,35 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
     }
 
     protected static BlockBehaviour.Properties getPeekProp() {
-        return PROPERTIES.isEmpty() ? BlockBehaviour.Properties.of() : PROPERTIES.peek();
+        return bpManager.build();
     }
 
-    public static void pushProperties(BlockBehaviour.Properties p) {
-        PROPERTIES.push(p);
+    @SafeVarargs
+    public static void pushProp(Consumer<BlockBehaviour.Properties> ... modifiers) {
+        bpManager.pushProp(false, false,modifiers);
     }
 
-    public static void popProperties() {
-        PROPERTIES.pop();
+    @SafeVarargs
+    public static void inheritProp(Consumer<BlockBehaviour.Properties> ... modifiers) {
+        bpManager.pushProp(true, false, modifiers);
+    }
+
+    @SafeVarargs
+    public static void pushPropDisposable(Consumer<BlockBehaviour.Properties> ... modifiers) {
+        bpManager.pushProp(false, true,modifiers);
+    }
+
+    @SafeVarargs
+    public static void inheritPropDisposable(Consumer<BlockBehaviour.Properties> ... modifiers) {
+        bpManager.pushProp(true, true,modifiers);
+    }
+
+    public static void dupProp() {
+        bpManager.dupProp();
+    }
+
+    public static void popProp() {
+        bpManager.popProp();
     }
 
     @Override
@@ -88,19 +109,22 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
     @Override
     @DataGenOnly
     protected void provideModel() {
-        mbBlock = DataProviders.MODEL_BLOCK.getOrCreateModel(loc);
-        provideBlockModel();
+        mbBlock = provideBlockModel();
         provideItemModel();
     }
 
     @DataGenOnly
     protected void provideItemModel() {
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc).parent(mbBlock);
+        if (mbBlock != null) {
+            DataProviders.MODEL_ITEM.getOrCreateModel(loc).parent(mbBlock);
+        }
     }
 
     @DataGenOnly
-    protected void provideBlockModel() {
-        mbBlock.parent("minecraft:block/cube_all").texture("all", loc);
+    protected @Nullable ModelBuilder provideBlockModel() {
+        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
+                .parent("minecraft:block/cube_all")
+                .texture("all", loc);
     }
 
     @DataGenOnly

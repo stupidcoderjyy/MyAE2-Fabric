@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("removal")
 @Environment(EnvType.CLIENT)
 public class CompassModel implements IModCustomModel {
     private BakedModel base, pointer;

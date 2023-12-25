@@ -2,6 +2,7 @@ package com.stupidcoderx.modding.client;
 
 import com.stupidcoderx.modding.client.render.IModCustomModel;
 import com.stupidcoderx.modding.core.IRegistry;
+import com.stupidcoderx.modding.core.Mod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -24,6 +25,10 @@ public class BuiltInModelRegistry implements IRegistry, ModelResourceProvider {
 
     public void register(ResourceLocation loc, IModCustomModel model) {
         models.put(loc, model);
+    }
+
+    public void register(String loc, IModCustomModel model) {
+        models.put(Mod.modLoc(loc), model);
     }
 
     @Override

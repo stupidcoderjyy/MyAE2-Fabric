@@ -27,7 +27,7 @@ public class CompassItemDef extends ItemDef<Item> {
     @Override
     @Environment(EnvType.CLIENT)
     public void clientRegister() {
-        BuiltInModelRegistry.INSTANCE.register(Mod.modLoc(EXPANDED_ID), new CompassModel());
+        BuiltInModelRegistry.INSTANCE.register(EXPANDED_ID, new CompassModel());
     }
 
     @Override
