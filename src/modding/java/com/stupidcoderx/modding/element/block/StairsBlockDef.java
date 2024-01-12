@@ -49,13 +49,13 @@ public class StairsBlockDef extends ExtendedBlockDef<StairBlock> {
         ResourceLocation top = getBaseBlockTexture("top", "top", "end", "all");
         ResourceLocation side = getBaseBlockTexture("side", "side", "all");
         ResourceLocation bottom = getBaseBlockTexture("bottom", "bottom", "end", "all");
-        DataProviders.MODEL_BLOCK.getOrCreateModel(loc.withSuffix("_inner"))
+        DataProviders.MODEL_BLOCK.model(loc.withSuffix("_inner"))
                 .parent("block/inner_stairs")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
-        DataProviders.MODEL_BLOCK.getOrCreateModel(loc.withSuffix("_outer"))
+        DataProviders.MODEL_BLOCK.model(loc.withSuffix("_outer"))
                 .parent("block/outer_stairs")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
-        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
+        return DataProviders.MODEL_BLOCK.model(loc)
                 .parent("block/stairs")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
     }

@@ -22,7 +22,7 @@ public class ModelProvider extends ModDataProvider<ModelProvider> {
         this.defaultModelBuilderSupplier = loc -> new ModelBuilder(pathPrefix, loc);
     }
 
-    public ModelBuilder getOrCreateModel(ResourceLocation loc) {
+    public ModelBuilder model(ResourceLocation loc) {
         loc = Mod.expandLoc(prefix, loc);
         return models.computeIfAbsent(loc, defaultModelBuilderSupplier);
     }

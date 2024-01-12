@@ -8,6 +8,8 @@ import com.stupidcoderx.modding.datagen.model.ModelBuilder;
 import com.stupidcoderx.modding.element.block.BlockDef;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> {
@@ -40,16 +42,17 @@ public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> {
     @Environment(EnvType.CLIENT)
     public void clientRegister() {
         BuiltInModelRegistry.INSTANCE.register(BLOCK_ID, new QuartzGlassModel());
+        BlockRenderLayerMap.INSTANCE.putBlock(block, RenderType.translucent());
     }
 
     @Override
     protected ModelBuilder provideBlockModel() {
-        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc).loader(BLOCK_ID);
+        return DataProviders.MODEL_BLOCK.model(loc).loader(BLOCK_ID);
     }
 
     @Override
     protected void provideItemModel() {
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+        DataProviders.MODEL_ITEM.model(loc)
                 .parent("block/cube_all")
                 .texture("all", Mod.modLoc(ID));
     }

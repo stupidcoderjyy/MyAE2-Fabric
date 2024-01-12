@@ -4,7 +4,8 @@
   "package": "com.stupidcoderx.modding.mixin",
   "compatibilityLevel": "JAVA_11",
   "mixins": [
-      "EnchantmentHelperMixin"
+      "EnchantmentHelperMixin",
+      "VariantDeserializerMixin"
   ],
   "client": [],
   "server": [],

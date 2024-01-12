@@ -7,18 +7,22 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class SeparationConfig<T extends SeparateObject<T>> {
-    final int[] dimSeq = new int[]{0,1,2};
-    final float[] range = new float[6];
-    Consumer<SeparationResult<T>> finishedAction = r -> {};
-    Map<Direction, Consumer<T>> separateActions = new EnumMap<>(Direction.class);
+public class ScoopConfig {
+    final MapProperty<Integer> dimSeq = new MapProperty<>(0, 1, 2);
+    final CubeProperty range = new CubeProperty();
+    Consumer<ScoopResult> finishedAction = r -> {};
+    Map<Direction, Consumer<Cube>> separateActions = new EnumMap<>(Direction.class);
     boolean remove = true;
+    final ActionContext ctx;
     private final ICubeCreateStrategy strategy;
+    private final ActionRecord ar;
     private final float[] base;
 
-    SeparationConfig(ICubeCreateStrategy strategy, float[] base) {
-        this.strategy = strategy;
+    ScoopConfig(float[] base, ActionContext ctx, ActionRecord ar) {
+        this.strategy = ctx.cubeCreateStrategy;
         this.base = base;
+        this.ctx = ctx;
+        this.ar = ar;
     }
 
     public static final int XYZ = 0x012;
@@ -32,16 +36,14 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * 设置切割顺序
      * @param seq 维度序列，使用{@link #XYZ},{@link #XZY},{@link #YXZ},{@link #YZX},{@link #ZXY},{@link #ZYX}
      */
-    public SeparationConfig<T> dimensionSeq(int seq) {
+    public ScoopConfig dimensionSeq(int seq) {
         int first = (seq >> 8) & 0xF;
         int second = (seq >> 4) & 0xF;
         int third = seq & 0xF;
         Preconditions.checkArgument( first <= 3);
         Preconditions.checkArgument(second <= 3);
         Preconditions.checkArgument(third <= 3);
-        dimSeq[0] = first;
-        dimSeq[1] = second;
-        dimSeq[2] = third;
+        dimSeq.set(first, second, third).rotate(ar);
         return this;
     }
 
@@ -52,8 +54,9 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param width 立方体宽度（z轴方向长度）
      * @return 调用者
      */
-    public SeparationConfig<T> range(float length, float height, float width) {
-        strategy.set(range, base, length, height, width);
+    public ScoopConfig range(float length, float height, float width) {
+        MapProperty<Float> p = new MapProperty<>(length, height, width).rotate(ar);
+        strategy.set(range.area, base, p.x(), p.y(), p.z());
         return this;
     }
 
@@ -61,13 +64,8 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * 设置切割范围
      * @return 调用者
      */
-    public SeparationConfig<T> range(float x1, float y1, float z1, float x2, float y2, float z2) {
-        range[0] = x1;
-        range[1] = y1;
-        range[2] = z1;
-        range[3] = x2;
-        range[4] = y2;
-        range[5] = z2;
+    public ScoopConfig range(float x1, float y1, float z1, float x2, float y2, float z2) {
+        range.set(x1, y1, z1, x2, y2, z2).rotate(ar);
         return this;
     }
 
@@ -77,10 +75,11 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param level 对齐方向上的坐标
      * @return 调用者
      */
-    public SeparationConfig<T> align(Direction d, float level) {
-        float distance = level - range[d.index];
-        range[d.dim] += distance;
-        range[d.dim + 3] += distance;
+    public ScoopConfig align(Direction d, float level) {
+        Direction d0 = d.clockwise(ar);
+        float distance = level - range.area[d0.index];
+        range.area[d0.dim] += distance;
+        range.area[d0.dim + 3] += distance;
         return this;
     }
 
@@ -89,7 +88,7 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param remove 删除为true，保留为false
      * @return 调用者
      */
-    public SeparationConfig<T> removeMode(boolean remove) {
+    public ScoopConfig removeMode(boolean remove) {
         this.remove = remove;
         return this;
     }
@@ -100,12 +99,13 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param distance 距离
      * @return 调用者
      */
-    public SeparationConfig<T> shift(float distance, Direction d) {
+    public ScoopConfig shift(float distance, Direction d) {
+        d = d.clockwise(ar);
         if (!d.isPositive) {
             distance = -distance;
         }
-        range[d.dim] += distance;
-        range[d.dim + 3] += distance;
+        range.area[d.dim] += distance;
+        range.area[d.dim + 3] += distance;
         return this;
     }
 
@@ -115,8 +115,9 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param op 完成目标方向的切割后执行的操作。若在目标方向上没有切出新的方块，则传入null
      * @return 调用者
      */
-    public SeparationConfig<T> separateAction(Direction d, Consumer<T> op) {
-        this.separateActions.put(d, op);
+    public ScoopConfig separateAction(Direction d, Consumer<Cube> op) {
+        d = d.clockwise(ar);
+        separateActions.put(d, op);
         return this;
     }
 
@@ -126,8 +127,9 @@ public class SeparationConfig<T extends SeparateObject<T>> {
      * @param op 完成目标方向的切割后执行的操作。若在目标方向上没有切出新的方块，则传入null
      * @return 调用者
      */
-    public SeparationConfig<T> separateAction(Predicate<Direction> cond, Consumer<T> op) {
+    public ScoopConfig separateAction(Predicate<Direction> cond, Consumer<Cube> op) {
         for (Direction d : Direction.values()) {
+            d = d.clockwise(ar);
             if (cond.test(d)) {
                 separateActions.put(d, op);
             }
@@ -138,11 +140,11 @@ public class SeparationConfig<T extends SeparateObject<T>> {
     /**
      * 设置切割完成后执行的操作
      * @param op 操作
-     * @see SeparationResult
+     * @see ScoopResult
      * @return 调用者
      */
-    public SeparationConfig<T> finishedAction(Consumer<SeparationResult<T>> op) {
-        this.finishedAction = op;
+    public ScoopConfig finishedAction(Consumer<ScoopResult> op) {
+        finishedAction = op;
         return this;
     }
 }

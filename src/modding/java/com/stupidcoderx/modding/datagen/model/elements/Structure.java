@@ -16,12 +16,10 @@ import java.util.function.Predicate;
  */
 public class Structure {
     private static int maxId = 0;
-    private final float[] outline = new float[6];
     private final float[] workspace = new float[6];
-    private final Set<Cube> cubes = new HashSet<>();
-    private final List<Cube> active = new ArrayList<>();
-    private ICubeCreateStrategy cubeCreateStrategy = ICubeCreateStrategy.CENTER;
     private final float[] basePoint = new float[3];
+    final ActionRecord ar = new ActionRecord(this);
+    final ActionContext ctx = new ActionContext();
 
     /**
      * 创建一个自定义空间大小、自定义基点策略的结构。空间大小影响基点坐标计算和{@link #stackTo(Direction)}的坐标计算
@@ -55,9 +53,29 @@ public class Structure {
         this(IBasePointStrategy.CENTER);
     }
 
-    void internalAdd(Cube e) {
-        cubes.add(e);
-        updateOutline(e);
+    public Structure startRecord() {
+        ar.startRecord();
+        return this;
+    }
+
+    public Structure stopRecord() {
+        ar.endRecord();
+        return this;
+    }
+
+    public ActionRecord getRecord() {
+        return ar;
+    }
+
+    public Structure runRecord(Consumer<ActionRecord> cfg) {
+        cfg.accept(ar);
+        ar.runRecord(ctx);
+        return this;
+    }
+
+    public Structure runRecord(ActionRecord record) {
+        record.runRecord(ctx);
+        return this;
     }
 
     /**
@@ -67,9 +85,12 @@ public class Structure {
      * @return 调用者
      */
     public Structure globalShift(float val, Direction ... ds) {
-        for (Direction d : ds) {
-            shift(cubes, val, d);
-        }
+        ar.recordAndRun(ctx -> {
+            for (Direction d : ds) {
+                d = d.clockwise(ar);
+                shift0(ctx, ctx.cubes, val, d);
+            }
+        });
         return this;
     }
 
@@ -78,16 +99,18 @@ public class Structure {
      * @param op 配置挖勺工作参数的逻辑
      * @return 调用者
      */
-    public Structure globalScoop(Consumer<SeparationConfig<Cube>> op) {
-        SeparationConfig<Cube> cfg = new SeparationConfig<>(cubeCreateStrategy, basePoint);
-        op.accept(cfg);
-        for (Cube e : cubes) {
-            SeparationResult<Cube> result = e.separate(cfg);
-            if (result.children.isEmpty()) {
-                continue;
+    public Structure globalScoop(Consumer<ScoopConfig> op) {
+        ar.recordAndRun(ctx -> {
+            ScoopConfig cfg = new ScoopConfig(this.basePoint, ctx, ar);
+            op.accept(cfg);
+            for (Cube e : ctx.cubes) {
+                ScoopResult result = e.scoop(cfg);
+                if (result.children.isEmpty()) {
+                    continue;
+                }
+                cfg.finishedAction.accept(result);
             }
-            cfg.finishedAction.accept(result);
-        }
+        });
         return this;
     }
 
@@ -98,9 +121,12 @@ public class Structure {
      * @return 调用者
      */
     public Structure globalAlign(float base, Direction ... faces) {
-        for (Direction face : faces) {
-            globalShift(-Math.abs(outline[face.index] - base), face);
-        }
+        ar.recordAndRun(ctx -> {
+            for (Direction face : faces) {
+                face = face.clockwise(ar);
+                globalShift(-Math.abs(ctx.outline[face.index] - base), face);
+            }
+        });
         return this;
     }
 
@@ -111,7 +137,7 @@ public class Structure {
      */
     public Structure cubeCreateStrategy(ICubeCreateStrategy strategy) {
         Preconditions.checkNotNull(strategy);
-        this.cubeCreateStrategy = strategy;
+        ar.recordAndRun(ctx -> ctx.cubeCreateStrategy = strategy);
         return this;
     }
 
@@ -125,9 +151,14 @@ public class Structure {
      * @return 调用者
      */
     public Structure create(String name, float length, float height, float width) {
-        Cube c = new Cube(this, name);
-        cubeCreateStrategy.set(c.data, basePoint, length, height, width);
-        return create0(c);
+        ar.recordAndRun(ctx -> {
+            Cube c = new Cube(this, name);
+            MapProperty<Float> p = new MapProperty<>(length, height, width)
+                    .rotate(ar);
+            ctx.cubeCreateStrategy.set(c.data.area, basePoint, p.x(), p.y(), p.z());
+            create0(ctx, c);
+        });
+        return this;
     }
 
     /**
@@ -146,45 +177,48 @@ public class Structure {
      * @return 调用者
      */
     public Structure stackTo(Direction d) {
-        Set<Cube> targets = new HashSet<>(cubes);
-        active.forEach(targets::remove);
-        Direction opposite = d.opposite();
-        for (Cube c : active) {
-            Cube resCube = null;
-            float resPos = outline[opposite.index]; //一定是d方向上最小的
-            for (Cube target : targets) {
-                //是否嵌在立方体里面
-                if (!c.isSeparated(target.data)) {
+        ar.recordAndRun(ctx -> {
+            Direction d1 = d.clockwise(ar);
+            Set<Cube> targets = new HashSet<>(ctx.cubes);
+            ctx.active.forEach(targets::remove);
+            Direction opposite = d1.opposite();
+            for (Cube c : ctx.active) {
+                Cube resCube = null;
+                float resPos = ctx.outline[opposite.index]; //一定是d方向上最小的
+                for (Cube target : targets) {
+                    //是否嵌在立方体里面
+                    if (!c.isSeparated(target.data.area)) {
+                        resCube = target;
+                        break;
+                    }
+                    float targetPos = target.data.area[opposite.index];
+                    float originalPos = c.data.area[d1.index];
+                    //如果比自己的坐标还小，那肯定不是
+                    if (d1.larger(originalPos, targetPos)) {
+                        continue;
+                    }
+                    //只取第一个遇到的
+                    if (resCube != null && d1.larger(targetPos, resPos)) {
+                        continue;
+                    }
+                    //检测移动过程中c是否会撞到target
+                    if (!collide(c, target, d1.dim)) {
+                        continue;
+                    }
                     resCube = target;
-                    break;
+                    resPos = targetPos;
                 }
-                float targetPos = target.data[opposite.index];
-                float originalPos = c.data[d.index];
-                //如果比自己的坐标还小，那肯定不是
-                if (d.larger(originalPos, targetPos)) {
+                float original = c.data.area[d1.index];
+                if (resCube != null) {
+                    c.data.area[d1.index] = resCube.data.area[opposite.index];
+                    c.data.area[opposite.index] += c.data.area[d1.index] - original;
                     continue;
                 }
-                //只取第一个遇到的
-                if (resCube != null && d.larger(targetPos, resPos)) {
-                    continue;
-                }
-                //检测移动过程中c是否会撞到target
-                if (!collide(c, target, d.dim)) {
-                    continue;
-                }
-                resCube = target;
-                resPos = targetPos;
+                //贴到workspace上
+                c.data.area[d1.index] = workspace[d1.index];
+                c.data.area[opposite.index] += (workspace[d1.index] - original);
             }
-            float original = c.data[d.index];
-            if (resCube != null) {
-                c.data[d.index] = resCube.data[opposite.index];
-                c.data[opposite.index] += c.data[d.index] - original;
-                continue;
-            }
-            //贴到workspace上
-            c.data[d.index] = workspace[d.index];
-            c.data[opposite.index] += (workspace[d.index] - original);
-        }
+        });
         return this;
     }
 
@@ -199,8 +233,8 @@ public class Structure {
 
     private boolean collide0(Cube c, Cube target, int dim) {
         int larger = dim + 3;
-        return (c.data[dim] >= target.data[dim] && c.data[dim] < target.data[larger]) ||
-                (c.data[larger] >= target.data[dim] && c.data[larger] < target.data[larger]);
+        return (c.data.area[dim] >= target.data.area[dim] && c.data.area[dim] < target.data.area[larger]) ||
+                (c.data.area[larger] >= target.data.area[dim] && c.data.area[larger] < target.data.area[larger]);
     }
 
     /**
@@ -209,7 +243,7 @@ public class Structure {
      * @return 调用者
      */
     public Structure process(Consumer<Cube> op) {
-        active.forEach(op);
+        ar.recordAndRun(ctx -> ctx.active.forEach(op));
         return this;
     }
 
@@ -226,9 +260,12 @@ public class Structure {
      * @return 调用者
      */
     public Structure create(String name, float x1, float y1, float z1, float x2, float y2, float z2) {
-        Cube c = new Cube(this, name);
-        c.set(x1, y1, z1, x2, y2, z2);
-        return create0(c);
+        ar.recordAndRun(ctx -> {
+            Cube c = new Cube(this, name);
+            c.set(x1, y1, z1, x2, y2, z2); //Cube内部进行旋转
+            create0(ctx, c);
+        });
+        return this;
     }
 
     /**
@@ -239,11 +276,10 @@ public class Structure {
         return create("cube" + maxId++, x1, y1, z1, x2, y2, z2);
     }
 
-    private Structure create0(Cube c) {
-        active.clear();
-        active.add(c);
-        internalAdd(c);
-        return this;
+    private static void create0(ActionContext ctx, Cube c) {
+        ctx.active.clear();
+        ctx.active.add(c);
+        internalAdd(ctx, c);
     }
 
     /**
@@ -253,9 +289,12 @@ public class Structure {
      * @return 调用者
      */
     public Structure shift(float val, Direction ... ds) {
-        for (Direction d : ds) {
-            shift(active, val, d);
-        }
+        ar.recordAndRun(ctx -> {
+            for (Direction d : ds) {
+                d = d.clockwise(ar);
+                shift0(ctx, ctx.active, val, d);
+            }
+        });
         return this;
     }
 
@@ -266,9 +305,12 @@ public class Structure {
      * @return 调用者
      */
     public Structure align(int base, Direction ... faces) {
-        for (Direction face : faces) {
-            shift(-Math.abs(outline[face.index] - base), face);
-        }
+        ar.recordAndRun(ctx -> {
+            for (Direction f : faces) {
+                f = f.clockwise(ar);
+                shift(-Math.abs(ctx.outline[f.index] - base), f);
+            }
+        });
         return this;
     }
 
@@ -277,21 +319,23 @@ public class Structure {
      * @param op 配置挖勺工作参数的逻辑
      * @return 调用者
      */
-    public Structure scoop(Consumer<SeparationConfig<Cube>> op) {
-        List<Cube> temp = new ArrayList<>(active);
-        active.clear();
-        SeparationConfig<Cube> cfg = new SeparationConfig<>(cubeCreateStrategy, basePoint);
-        op.accept(cfg);
-        for (Cube e : temp) {
-            SeparationResult<Cube> result = e.separate(cfg);
-            if (result.children.isEmpty()) {
-                continue;
+    public Structure scoop(Consumer<ScoopConfig> op) {
+        ar.recordAndRun(ctx -> {
+            List<Cube> temp = new ArrayList<>(ctx.active);
+            ctx.active.clear();
+            ScoopConfig cfg = new ScoopConfig(this.basePoint, ctx, ar);
+            op.accept(cfg);
+            for (Cube e : temp) {
+                ScoopResult result = e.scoop(cfg);
+                if (result.children.isEmpty()) {
+                    continue;
+                }
+                ctx.cubes.remove(e);
+                result.children.forEach((d, childCube) -> ctx.active.add(childCube));
+                cfg.finishedAction.accept(result);
             }
-            cubes.remove(e);
-            result.children.forEach((d, childCube) -> active.add(childCube));
-            cfg.finishedAction.accept(result);
-        }
-        cubes.forEach(this::updateOutline);
+            ctx.cubes.forEach(c -> updateOutline(ctx, c));
+        });
         return this;
     }
 
@@ -301,8 +345,10 @@ public class Structure {
      * @return 调用者
      */
     public Structure find(Predicate<Cube> condition) {
-        active.clear();
-        cubes.stream().filter(condition).forEach(active::add);
+        ar.recordAndRun(ctx -> {
+            ctx.active.clear();
+            ctx.cubes.stream().filter(condition).forEach(ctx.active::add); //condition执行的时候Cube内部会自动进行变换
+        });
         return this;
     }
 
@@ -312,7 +358,11 @@ public class Structure {
      * @return 调用者
      */
     public Structure findMost(Direction d) {
-        return find(c -> outline[d.index] == c.data[d.index]);
+        ar.recordAndRun(ctx -> {
+            Direction d0 = d.clockwise(ar);
+            find(c -> ctx.outline[d0.index] == c.data.area[d0.index]);
+        });
+        return this;
     }
 
     /**
@@ -321,9 +371,11 @@ public class Structure {
      * @return 调用者
      */
     public Structure filter(Predicate<Cube> condition) {
-        List<Cube> worker = new ArrayList<>(active);
-        active.clear();
-        worker.stream().filter(condition).forEach(active::add);
+        ar.recordAndRun(ctx -> {
+            List<Cube> worker = new ArrayList<>(ctx.active);
+            ctx.active.clear();
+            worker.stream().filter(condition).forEach(ctx.active::add);
+        });
         return this;
     }
 
@@ -333,7 +385,7 @@ public class Structure {
      * @return 坐标值
      */
     public float getOutline(Direction d) {
-        return outline[d.index];
+        return ctx.outline[d.clockwise(ar.rotDim(), ar.rotCount()).index];
     }
 
     /**
@@ -342,7 +394,7 @@ public class Structure {
      */
     public JsonArray toJson() {
         JsonArray elementsObj = new JsonArray();
-        for (Cube c : cubes) {
+        for (Cube c : ctx.cubes) {
             elementsObj.add(c.toJson());
         }
         return elementsObj;
@@ -353,11 +405,11 @@ public class Structure {
      * @return 形状
      */
     public VoxelShape toVoxelShape() {
-        if (cubes.isEmpty()) {
+        if (ctx.cubes.isEmpty()) {
             return Shapes.empty();
         }
         VoxelShape shape = null;
-        for (Cube c : cubes) {
+        for (Cube c : ctx.cubes) {
             shape = shape == null ?
                     c.toVoxelShape() :
                     Shapes.or(shape, c.toVoxelShape());
@@ -369,27 +421,32 @@ public class Structure {
      * 将结构重置
      */
     public void clear() {
-        cubes.clear();
-        active.clear();
+        ctx.cubes.clear();
+        ctx.active.clear();
     }
 
-    private void shift(Collection<Cube> targets, float val, Direction d) {
+    private static void shift0(ActionContext ctx, Collection<Cube> targets, float val, Direction d) {
         if (!d.isPositive) {
             val = -val;
         }
         int i = d.dim, j = d.dim + 3;
         for (Cube e : targets) {
-            e.data[i] += val;
-            e.data[j] += val;
+            e.data.area[i] += val;
+            e.data.area[j] += val;
         }
-        outline[i] += val;
-        outline[j] += val;
+        ctx.outline[i] += val;
+        ctx.outline[j] += val;
     }
 
-    private void updateOutline(Cube b) {
+    static void internalAdd(ActionContext ctx, Cube e) {
+        ctx.cubes.add(e);
+        updateOutline(ctx, e);
+    }
+
+    private static void updateOutline(ActionContext ctx, Cube b) {
         for (int i = 0, j = 3 ; i < 3 ; i++, j++) {
-            outline[i] = Math.min(b.data[i], outline[i]);
-            outline[j] = Math.max(b.data[j], outline[j]);
+            ctx.outline[i] = Math.min(b.data.area[i], ctx.outline[i]);
+            ctx.outline[j] = Math.max(b.data.area[j], ctx.outline[j]);
         }
     }
 }

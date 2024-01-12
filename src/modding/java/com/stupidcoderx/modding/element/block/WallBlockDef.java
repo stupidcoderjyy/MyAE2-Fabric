@@ -49,13 +49,13 @@ public class WallBlockDef extends ExtendedBlockDef<WallBlock> {
     protected void provideModel() {
         //不需要为自己创建模型文件
         ResourceLocation side = getBaseBlockTexture("side", "side", "all");
-        DataProviders.MODEL_BLOCK.getOrCreateModel(locSide)
+        DataProviders.MODEL_BLOCK.model(locSide)
                 .parent("block/template_wall_side").texture("wall", side);
-        DataProviders.MODEL_BLOCK.getOrCreateModel(locSideTall)
+        DataProviders.MODEL_BLOCK.model(locSideTall)
                 .parent("block/template_wall_side_tall").texture("wall", side);
-        DataProviders.MODEL_BLOCK.getOrCreateModel(locPost)
+        DataProviders.MODEL_BLOCK.model(locPost)
                 .parent("block/template_wall_post").texture("wall", side);
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+        DataProviders.MODEL_ITEM.model(loc)
                 .parent("block/wall_inventory").texture("wall", side);
     }
 }

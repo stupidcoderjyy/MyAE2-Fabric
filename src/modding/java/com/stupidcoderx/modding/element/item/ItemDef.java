@@ -97,7 +97,7 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
      */
     @DataGenOnly
     protected void provideModel() {
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+        DataProviders.MODEL_ITEM.model(loc)
                 .parent("minecraft:item/generated")
                 .texture("layer0", loc);
     }
@@ -146,7 +146,7 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
         return new ItemDef<>(loc, name, item) {
             @Override
             protected void provideModel() {
-                DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+                DataProviders.MODEL_ITEM.model(loc)
                         .parent("minecraft:item/" + prefix)
                         .texture("layer0", loc);
             }

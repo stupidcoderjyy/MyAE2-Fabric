@@ -30,11 +30,11 @@ public class VariantsBlockStateBuilder implements IBuilderElement {
     }
 
     /**
-     * 添加面的状态变量
+     * 添加面的状态变量，面的排列顺序同{@link net.minecraft.core.Direction}中保持一致
      * @return 调用者
      */
-    public VariantsBlockStateBuilder variantFace() {
-        return variant("face", List.of("east", "south", "west", "north", "top", "down"));
+    public VariantsBlockStateBuilder variantFacing() {
+        return variant("facing", List.of("down", "up", "north", "south", "west", "east"));
     }
 
     /**

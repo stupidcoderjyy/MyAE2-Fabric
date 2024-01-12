@@ -38,10 +38,10 @@ public class SlabBlockDef extends ExtendedBlockDef<SlabBlock> {
         ResourceLocation top = getBaseBlockTexture("top", "top", "end", "all");
         ResourceLocation side = getBaseBlockTexture("side", "side", "all");
         ResourceLocation bottom = getBaseBlockTexture("bottom", "bottom", "end", "all");
-        DataProviders.MODEL_BLOCK.getOrCreateModel(locTop)
+        DataProviders.MODEL_BLOCK.model(locTop)
                 .parent("block/slab_top")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
-        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
+        return DataProviders.MODEL_BLOCK.model(loc)
                 .parent("block/slab")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
     }

@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.element.block;
 
+import com.google.common.base.Preconditions;
 import com.stupidcoderx.modding.core.DataGenOnly;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -14,6 +15,7 @@ public abstract class ExtendedBlockDef<B extends Block> extends BlockDef<B>{
 
     @DataGenOnly
     protected ResourceLocation getBaseBlockTexture(String key, String ... candidates) {
+        Preconditions.checkNotNull(baseBlock.mbBlock, "null block model builder:" + baseBlock);
         ResourceLocation loc;
         for (String c : candidates) {
             loc = baseBlock.mbBlock.textures.get(c);

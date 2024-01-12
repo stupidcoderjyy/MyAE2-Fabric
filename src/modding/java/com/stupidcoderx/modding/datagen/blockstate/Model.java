@@ -30,7 +30,7 @@ public class Model {
     }
 
     public Model rotationZ(int times) {
-        rotation[1] = (times % 4) * 90;
+        rotation[2] = (times % 4) * 90;
         return this;
     }
 

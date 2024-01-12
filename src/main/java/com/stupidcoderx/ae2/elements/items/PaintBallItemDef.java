@@ -64,7 +64,7 @@ public class PaintBallItemDef extends ItemDef<Item> {
 
     @Override
     protected void provideModel() {
-        DataProviders.MODEL_ITEM.getOrCreateModel(loc)
+        DataProviders.MODEL_ITEM.model(loc)
                 .parent("item/generated")
                 .texture("layer0", Mod.modLoc(isLumen ? "paint_ball_shimmer" : "paint_ball"));
     }

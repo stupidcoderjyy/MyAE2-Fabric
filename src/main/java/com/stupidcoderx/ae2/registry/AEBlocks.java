@@ -1,5 +1,6 @@
 package com.stupidcoderx.ae2.registry;
 
+import com.stupidcoderx.ae2.elements.blocks.drive.DriveBlockDef;
 import com.stupidcoderx.ae2.elements.blocks.glass.QuartzGlassBlockDef;
 import com.stupidcoderx.modding.element.block.BlockDef;
 import net.minecraft.world.level.block.SoundType;
@@ -14,6 +15,8 @@ public class AEBlocks {
     public static final BlockDef<?> CUT_QUARTZ_BLOCK, CUT_QUARTZ_STAIRS, CUT_QUARTZ_WALL, CUT_QUARTZ_SLAB;
 
     public static final BlockDef<?> QUARTZ_GLASS, QUARTZ_GLASS_VIBRANT;
+
+    public static final BlockDef<?> DRIVE;
     static {
         BlockDef.pushTab(AECreativeTabs.MAIN);
         BlockDef.pushProp(Types.BASE);
@@ -29,6 +32,10 @@ public class AEBlocks {
         BlockDef.inheritProp(Types.GLASS);
         QUARTZ_GLASS = QuartzGlassBlockDef.create("石英玻璃", false);
         QUARTZ_GLASS_VIBRANT = QuartzGlassBlockDef.create("充能石英玻璃", true);
+        BlockDef.popProp();
+
+        BlockDef.inheritProp(Types.METAL);
+        DRIVE = new DriveBlockDef("drive", "ME驱动器");
         BlockDef.popProp();
 
         BlockDef.popProp();
@@ -50,5 +57,10 @@ public class AEBlocks {
         public static final Consumer<Properties> GLASS = p -> p
                 .mapColor(MapColor.NONE)
                 .sound(SoundType.GLASS);
+
+        public static final Consumer<Properties> METAL = p -> p
+                .mapColor(MapColor.METAL)
+                .sound(SoundType.METAL)
+                .forceSolidOn();
     }
 }

@@ -52,7 +52,7 @@ public class CompassItemDef extends ItemDef<Item> {
                         .face(Direction.PY).rotate(3)
                         .face(Direction.NX).rotate(2)
                         .face(Direction.NY, Direction.NZ).removeFaces());
-        DataProviders.MODEL_ITEM.getOrCreateModel(BASE_LOC)
+        DataProviders.MODEL_ITEM.model(BASE_LOC)
                 .parent("block/block")
                 .texture("0", loc)
                 .struct(base)
@@ -66,7 +66,7 @@ public class CompassItemDef extends ItemDef<Item> {
                         .rotation(75,45,0).translation(0, 2.5f, 2).scale(0.375f))
                 .display(Display.fixed()
                         .rotation(270,0,0).translation(0, 0, -10).scale(1.5f));
-        DataProviders.MODEL_ITEM.getOrCreateModel(POINTER_LOC)
+        DataProviders.MODEL_ITEM.model(POINTER_LOC)
                 .parent("block/block")
                 .texture("0", loc)
                 .struct(pointer);

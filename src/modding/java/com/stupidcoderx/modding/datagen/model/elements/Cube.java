@@ -7,31 +7,35 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * 立方体，可以为其绑定材质
  */
-public class Cube extends SeparateObject<Cube> {
+public class Cube {
     String name;
     final Map<Direction, Face> faces = new EnumMap<>(Direction.class);
+    final CubeProperty data = new CubeProperty();
     private boolean uvCorrect = true;
     private final List<Face> activeFaces = new ArrayList<>();
     private final Structure structure;
+    private final ActionRecord ar;
 
     Cube(Structure structure, String name) {
-        super(3);
         this.structure = structure;
+        this.ar = structure.ar;
         this.name = name;
     }
 
     void set(float x1, float y1, float z1, float x2, float y2, float z2) {
-        data[0] = x1;
-        data[1] = y1;
-        data[2] = z1;
-        data[3] = x2;
-        data[4] = y2;
-        data[5] = z2;
+        data.area[0] = x1;
+        data.area[1] = y1;
+        data.area[2] = z1;
+        data.area[3] = x2;
+        data.area[4] = y2;
+        data.area[5] = z2;
+        data.rotate(ar);
     }
 
     /**
@@ -74,7 +78,11 @@ public class Cube extends SeparateObject<Cube> {
      * @see #face(Direction...)
      */
     public Cube face(Predicate<Direction> condition) {
-        return face(Arrays.stream(Direction.values()).filter(condition).toArray(Direction[]::new));
+        face(Arrays.stream(Direction.values())
+                .filter(condition)
+                .map(d -> d.clockwise(ar.rotDim(), ar.rotCount()))
+                .toArray(Direction[]::new));
+        return this;
     }
 
     /**
@@ -83,7 +91,7 @@ public class Cube extends SeparateObject<Cube> {
      * @return 存在返回true
      */
     public boolean faceExits(Direction d) {
-        return faces.containsKey(d);
+        return faces.containsKey(d.clockwise(ar.rotDim(), ar.rotCount()));
     }
 
     /**
@@ -92,7 +100,7 @@ public class Cube extends SeparateObject<Cube> {
      * @return 存在返回true，当不存在对应面时返回false
      */
     public boolean faceHasTexture(Direction d) {
-        Face face = faces.get(d);
+        Face face = faces.get(d.clockwise(ar.rotDim(), ar.rotCount()));
         return face != null && face.texture != null;
     }
 
@@ -102,7 +110,7 @@ public class Cube extends SeparateObject<Cube> {
      * @return uv坐标合法返回true，当不存在对应面时返回false
      */
     public boolean faceHasValidUV(Direction d) {
-        Face face = faces.get(d);
+        Face face = faces.get(d.clockwise(ar.rotDim(), ar.rotCount()));
         return face != null && uvCorrect;
     }
 
@@ -180,26 +188,26 @@ public class Cube extends SeparateObject<Cube> {
     }
 
     public float length() {
-        return data[3] - data[0];
+        return data.area[3] - data.area[0];
     }
 
     public float height() {
-        return data[4] - data[1];
+        return data.area[4] - data.area[1];
     }
 
     public float width() {
-        return data[5] - data[2];
+        return data.area[5] - data.area[2];
     }
 
     VoxelShape toVoxelShape() {
-        return Block.box(data[0], data[1], data[2], data[3], data[4], data[5]);
+        return Block.box(data.area[0], data.area[1], data.area[2], data.area[3], data.area[4], data.area[5]);
     }
 
     JsonObject toJson() {
         JsonObject elementObj = new JsonObject();
         elementObj.addProperty("name", name);
-        elementObj.add("from", JsonUtil.serializeFloatArray(data, 0, 3));
-        elementObj.add("to", JsonUtil.serializeFloatArray(data, 3, 6));
+        elementObj.add("from", JsonUtil.serializeFloatArray(data.area, 0, 3));
+        elementObj.add("to", JsonUtil.serializeFloatArray(data.area, 3, 6));
         JsonObject facesObj = new JsonObject();
         for (Direction d : Direction.values()) {
             Face face = faces.get(d);
@@ -235,27 +243,70 @@ public class Cube extends SeparateObject<Cube> {
             case 1 -> iy = 2;
             case 2 -> iy = 1;
         }
-        tempSize[0] = data[ix + 3] - data[ix];
-        tempSize[1] = data[iy + 3] - data[iy];
+        tempSize[0] = data.area[ix + 3] - data.area[ix];
+        tempSize[1] = data.area[iy + 3] - data.area[iy];
     }
 
-    @Override
-    Cube copy() {
-        Cube e = copyData(new Cube(structure, name));
+    /*
+        坐标数据在创建的时候就完成了旋转，挖勺配置也在创建时完成旋转，面的数据也是旋转后的，故挖勺操作不需要作任何更改
+     */
+    ScoopResult scoop(ScoopConfig config) {
+        ScoopResult result = new ScoopResult();
+        float[] range = Arrays.copyOf(config.range.area, 6);
+        if (isSeparated(range)) {
+            return result;
+        }
+        shrink(range);
+        for (int m = 0 ; m < 3 ; m++) {
+            int i = config.dimSeq.get(m), j = i + 3;
+            if (range[i] > data.area[i]) {
+                Direction d = Direction.get(false, i);
+                Cube c = copy(config);
+                c.data.area[j] = range[i];
+                onSeparated(config, d, c, range, result);
+                data.area[i] = range[i];
+            }
+            if (range[j] < data.area[j]) {
+                Direction d = Direction.get(true, i);
+                Cube c = copy(config);
+                c.data.area[i] = range[j];
+                onSeparated(config, d, c, range, result);
+                data.area[j] = range[j];
+            }
+        }
+        return result;
+    }
+
+    private Cube copy(ScoopConfig cfg) {
+        Cube e = new Cube(structure, name);
+        System.arraycopy(data.area, 0, e.data.area, 0, 6);
         faces.forEach((d, f) -> e.faces.put(d, f.copy()));
-        structure.internalAdd(e);
+        Structure.internalAdd(cfg.ctx, e);
         return e;
     }
 
-    private Cube result;
-    private float valBig, valSmall;
+    private void shrink(float[] r) {
+        for (int i = 0, j = 3; i < 3; i ++, j++) {
+            r[i] = Math.max(r[i], data.area[i]);
+            r[j] = Math.min(r[j], data.area[j]);
+        }
+    }
 
-    @Override
-    void onSeparated(Direction d, Cube res, float[] range) {
+    boolean isSeparated(float[] r) {
+        for (int i = 0, j = 3; i < 3; i ++, j ++) {
+            if (data.area[i] >= r[j] || data.area[j] <= r[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void onSeparated(ScoopConfig config, Direction d, Cube c, float[] range, ScoopResult res) {
+        res.children.put(d, c);
         Preconditions.checkState(uvCorrect, "cube with incorrect uv cannot be scooped");
-        result = res;
-        valBig = Math.abs(range[d.dim + 3] - data[d.dim]);
-        valSmall = Math.abs(data[d.dim + 3] - range[d.dim + 3]);
+        result = c;
+        valBig = Math.abs(range[d.dim + 3] - data.area[d.dim]);
+        valSmall = Math.abs(data.area[d.dim + 3] - range[d.dim + 3]);
 
         //对与direction垂直的四个面对应的uv进行切割，由于MC中各个面的材质坐标系不满足对称性，所以只能枚举
         switch (d.dim) {
@@ -278,7 +329,14 @@ public class Cube extends SeparateObject<Cube> {
                 set(Direction.NX, !d.isPositive, 0);
             }
         }
+        Consumer<Cube> op = config.separateActions.get(d);
+        if (op != null) {
+            op.accept(c);
+        }
     }
+
+    private Cube result;
+    private float valBig, valSmall;
 
     private void set(Direction d, boolean start, int dim) {
         Face orgFace = faces.get(d);

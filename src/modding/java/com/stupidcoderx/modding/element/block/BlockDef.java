@@ -115,22 +115,23 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     @DataGenOnly
     protected void provideItemModel() {
-        if (mbBlock != null) {
-            DataProviders.MODEL_ITEM.getOrCreateModel(loc).parent(mbBlock);
-        }
+        DataProviders.MODEL_ITEM.model(loc).parent(Mod.expandLoc("block", loc));
     }
 
     @DataGenOnly
     protected @Nullable ModelBuilder provideBlockModel() {
-        return DataProviders.MODEL_BLOCK.getOrCreateModel(loc)
+        return DataProviders.MODEL_BLOCK.model(loc)
                 .parent("minecraft:block/cube_all")
                 .texture("all", loc);
     }
 
     @DataGenOnly
     protected void provideBlockState() {
-        DataProviders.BLOCK_STATE.variants(loc)
-                .condition(state -> new Model(loc));
+        if (block instanceof OrientableBlock ob) {
+            ob.orientationStrategy().provideBlockState(loc);
+        } else {
+            DataProviders.BLOCK_STATE.variants(loc).condition(state -> new Model(loc));
+        }
     }
 
     @Override
