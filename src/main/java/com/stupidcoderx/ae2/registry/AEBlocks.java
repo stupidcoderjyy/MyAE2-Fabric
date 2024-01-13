@@ -15,7 +15,8 @@ public class AEBlocks {
     //Decorative
     public static final BlockDef<?> QUARTZ_BLOCK;
     public static final BlockDef<?> CUT_QUARTZ_BLOCK, CUT_QUARTZ_STAIRS, CUT_QUARTZ_WALL, CUT_QUARTZ_SLAB;
-    public static final BlockDef<?> QUARTZ_DOOR, QUARTZ_TRAPDOOR, QUARTZ_FENCE, QUARTZ_FENCE_GATE;
+    public static final BlockDef<?> QUARTZ_DOOR, QUARTZ_TRAPDOOR, QUARTZ_FENCE, QUARTZ_FENCE_GATE,
+                                    QUARTZ_BUTTON;
 
     public static final BlockDef<?> QUARTZ_GLASS, QUARTZ_GLASS_VIBRANT;
 
@@ -34,6 +35,7 @@ public class AEBlocks {
         QUARTZ_TRAPDOOR = BlockDef.trapDoor("quartz_trapdoor", "切制Certus活板门", BlockSetType.BAMBOO);
         QUARTZ_FENCE = BlockDef.fence("quartz_fence", "切制Certus栅栏", CUT_QUARTZ_BLOCK);
         QUARTZ_FENCE_GATE = BlockDef.fenceGate("quartz_fence_gate", "切制Certus栅栏门", WoodType.BAMBOO, CUT_QUARTZ_BLOCK);
+        QUARTZ_BUTTON = BlockDef.button("quartz_button", "切制Certus按钮", BlockSetType.BAMBOO, CUT_QUARTZ_BLOCK);
         BlockDef.popProp();
 
         BlockDef.inheritProp(Types.GLASS);

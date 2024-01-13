@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class SlabBlockDef extends BlockDef<SlabBlock> {
+    @DataGenOnly
     private Supplier<ResourceLocation> modelFull, textureTop, textureSide, textureBottom;
 
     public SlabBlockDef(String id, String name, BlockDef<?> baseBlock) {

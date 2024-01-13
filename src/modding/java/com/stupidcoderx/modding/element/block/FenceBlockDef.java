@@ -24,12 +24,14 @@ public class FenceBlockDef extends BlockDef<FenceBlock>{
     }
 
     @Override
+    @DataGenOnly
     public void provideData() {
         super.provideData();
         DataProviders.BLOCK_TAGS.of(BlockTags.FENCES).add(block);
     }
 
     @Override
+    @DataGenOnly
     protected void provideBlockState() {
         ResourceLocation locPost = loc.withPrefix("block/").withSuffix("_post");
         ResourceLocation locSide = loc.withPrefix("block/").withSuffix("_side");
@@ -43,12 +45,14 @@ public class FenceBlockDef extends BlockDef<FenceBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected void provideItemModel() {
         DataProviders.MODEL_ITEM.model(loc)
                 .parent(loc.withPrefix("block/").withSuffix("_inventory"));
     }
 
     @Override
+    @DataGenOnly
     protected @Nullable ModelBuilder provideBlockModel() {
         addModel("_post");
         addModel("_side");

@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.element.block;
 
+import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
@@ -24,12 +25,14 @@ public class FenceGateBlockDef extends BlockDef<FenceGateBlock>{
     }
 
     @Override
+    @DataGenOnly
     public void provideData() {
         super.provideData();
         DataProviders.BLOCK_TAGS.of(BlockTags.FENCE_GATES).add(block);
     }
 
     @Override
+    @DataGenOnly
     protected void provideBlockState() {
         DataProviders.BLOCK_STATE.variants(loc)
                 .variant("facing", List.of("south", "west", "north", "east"))
@@ -49,11 +52,7 @@ public class FenceGateBlockDef extends BlockDef<FenceGateBlock>{
     }
 
     @Override
-    protected void provideItemModel() {
-        DataProviders.MODEL_ITEM.model(loc).parent(Mod.expandLoc("block", loc));
-    }
-
-    @Override
+    @DataGenOnly
     protected @Nullable ModelBuilder provideBlockModel() {
         for(int i = 0 ; i < 4 ; i ++) {
             String suffix = "";

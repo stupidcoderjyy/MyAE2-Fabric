@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.element.block;
 
+import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
 import com.stupidcoderx.modding.datagen.model.ModelBuilder;
@@ -20,6 +21,7 @@ public class TrapDoorBlockDef extends BlockDef<TrapDoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     public void provideData() {
         super.provideData();
         DataProviders.BLOCK_TAGS.of(BlockTags.TRAPDOORS).add(block);
@@ -32,6 +34,7 @@ public class TrapDoorBlockDef extends BlockDef<TrapDoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected void provideBlockState() {
         DataProviders.BLOCK_STATE.variants(loc)
                 .variant("facing", List.of("north", "east", "south", "west"))
@@ -59,12 +62,14 @@ public class TrapDoorBlockDef extends BlockDef<TrapDoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected void provideItemModel() {
         DataProviders.MODEL_ITEM.model(loc)
                 .parent(loc.withPrefix("block/").withSuffix("_bottom"));
     }
 
     @Override
+    @DataGenOnly
     protected @Nullable ModelBuilder provideBlockModel() {
         addModel("_top");
         addModel("_open");

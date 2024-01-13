@@ -109,6 +109,29 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
         return new FenceGateBlockDef(id, name, type, texture);
     }
 
+    /**
+     * 创建一个按钮方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param type 方块材料类型
+     * @param texture 提供材质的方块，方块模型必须使用生成器，且使用了名为"all"的材质
+     * @param ticksToStayPressed 激活按钮后，按钮保持激活状态的时间
+     * @param arrowCanPress 箭矢是否能激活按钮
+     * @return 按钮方块
+     */
+    public static ButtonBlockDef button(String id, String name, BlockSetType type, BlockDef<?> texture,
+                                        int ticksToStayPressed, boolean arrowCanPress) {
+        return new ButtonBlockDef(id, name, type, texture, ticksToStayPressed, arrowCanPress);
+    }
+
+    /**
+     *
+     * @see #button(String, String, BlockSetType, BlockDef, int, boolean)
+     */
+    public static ButtonBlockDef button(String id, String name, BlockSetType type, BlockDef<?> texture) {
+        return new ButtonBlockDef(id, name, type, texture, 20, true);
+    }
+
     protected static BlockBehaviour.Properties getPeekProp() {
         return bpManager.build();
     }

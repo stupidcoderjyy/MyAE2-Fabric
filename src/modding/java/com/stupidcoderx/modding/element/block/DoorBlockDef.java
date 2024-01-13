@@ -1,5 +1,6 @@
 package com.stupidcoderx.modding.element.block;
 
+import com.stupidcoderx.modding.core.DataGenOnly;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
@@ -21,6 +22,7 @@ public class DoorBlockDef extends BlockDef<DoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     public void provideData() {
         super.provideData();
         DataProviders.BLOCK_TAGS.of(BlockTags.DOORS).add(block);
@@ -33,6 +35,7 @@ public class DoorBlockDef extends BlockDef<DoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected void provideBlockState() {
         DataProviders.BLOCK_STATE.variants(loc)
                 .variant("facing", List.of("east", "south", "west", "north"))
@@ -59,6 +62,7 @@ public class DoorBlockDef extends BlockDef<DoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected void provideItemModel() {
         DataProviders.MODEL_ITEM.model(loc)
                 .parent("minecraft:item/generated")
@@ -66,6 +70,7 @@ public class DoorBlockDef extends BlockDef<DoorBlock>{
     }
 
     @Override
+    @DataGenOnly
     protected @Nullable ModelBuilder provideBlockModel() {
         for (int i = 0 ; i < 8 ; i ++) {
             String suffix = i >> 2 == 0 ? "_bottom" : "_top";
