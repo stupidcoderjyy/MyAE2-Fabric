@@ -13,7 +13,7 @@ public class WallBlockDef extends ExtendedBlockDef<WallBlock> {
     @DataGenOnly
     private ResourceLocation locSide, locSideTall, locPost;
 
-    WallBlockDef(String id, String name, BlockDef<?> baseBlock) {
+    public WallBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, baseBlock, new WallBlock(getPeekProp()));
         if (Mod.isEnvDataGen) {
             this.locSide = loc.withSuffix("_side");

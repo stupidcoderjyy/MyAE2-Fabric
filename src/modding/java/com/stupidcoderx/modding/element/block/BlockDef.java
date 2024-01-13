@@ -13,6 +13,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -59,6 +60,17 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     public static SlabBlockDef slab(String id, String name, BlockDef<?> baseBlock) {
         return new SlabBlockDef(id, name, baseBlock);
+    }
+
+    /**
+     * 创建一个门方块。需要提供三个贴图，分别为：门的上半部分（id_top.png）、门的下半部分（id_bottom.png）、门的物品（id.png）
+     * @param id 门方块id
+     * @param name 门方块的默认名称
+     * @param type 门的方块材料类型
+     * @return 门方块容器
+     */
+    public static DoorBlockDef door(String id, String name, BlockSetType type) {
+        return new DoorBlockDef(id, name, type);
     }
 
     protected static BlockBehaviour.Properties getPeekProp() {

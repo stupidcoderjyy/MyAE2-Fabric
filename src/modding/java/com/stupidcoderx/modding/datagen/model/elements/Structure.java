@@ -385,7 +385,7 @@ public class Structure {
      * @return 坐标值
      */
     public float getOutline(Direction d) {
-        return ctx.outline[d.clockwise(ar.rotDim(), ar.rotCount()).index];
+        return ctx.outline[d.clockwise(ar).index];
     }
 
     /**

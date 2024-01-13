@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.StairBlock;
 import java.util.List;
 
 public class StairsBlockDef extends ExtendedBlockDef<StairBlock> {
-    StairsBlockDef(String id, String name, BlockDef<?> baseBlock) {
+    public StairsBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, baseBlock, new StairBlock(baseBlock.block.defaultBlockState(), getPeekProp()));
     }
 

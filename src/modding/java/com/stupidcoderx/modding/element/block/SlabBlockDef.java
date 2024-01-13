@@ -13,7 +13,7 @@ import java.util.List;
 public class SlabBlockDef extends ExtendedBlockDef<SlabBlock> {
     private ResourceLocation locTop;
 
-    SlabBlockDef(String id, String name, BlockDef<?> baseBlock) {
+    public SlabBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, baseBlock, new SlabBlock(getPeekProp()));
         if (Mod.isEnvDataGen) {
             locTop = loc.withSuffix("_top");

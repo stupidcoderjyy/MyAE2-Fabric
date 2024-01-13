@@ -18,7 +18,7 @@ public class VariantsState {
      * @param key 变量名
      * @return 当前值
      */
-    public String getVal(String key) {
+    public String option(String key) {
         VariantType type = parent.nameToTypes.get(key);
         return properties[type.id];
     }
@@ -28,7 +28,7 @@ public class VariantsState {
      * @param typeId 变量id，由变量添加顺序决定
      * @return 当前的值
      */
-    public String getVal(int typeId) {
+    public String option(int typeId) {
         Preconditions.checkElementIndex(typeId, properties.length);
         return properties[typeId];
     }

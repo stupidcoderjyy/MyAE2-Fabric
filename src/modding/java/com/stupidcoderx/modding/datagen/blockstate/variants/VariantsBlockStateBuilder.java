@@ -38,6 +38,15 @@ public class VariantsBlockStateBuilder implements IBuilderElement {
     }
 
     /**
+     * 添加一个布尔类型的变量
+     * @param key 变量名
+     * @return 调用者
+     */
+    public VariantsBlockStateBuilder variantBool(String key) {
+        return variant(key, List.of("false", "true"));
+    }
+
+    /**
      * 设置获取模型属性的逻辑，这决定了每个状态下的方块模型
      * @param p 根据变量值获取模型属性的逻辑
      * @return 调用者
