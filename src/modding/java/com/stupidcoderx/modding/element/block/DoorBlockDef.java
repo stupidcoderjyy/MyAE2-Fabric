@@ -23,7 +23,7 @@ public class DoorBlockDef extends BlockDef<DoorBlock>{
     @Override
     public void provideData() {
         super.provideData();
-        DataProviders.BLOCK_TAGS.of(BlockTags.WOODEN_DOORS).add(block);
+        DataProviders.BLOCK_TAGS.of(BlockTags.DOORS).add(block);
     }
 
     @Override

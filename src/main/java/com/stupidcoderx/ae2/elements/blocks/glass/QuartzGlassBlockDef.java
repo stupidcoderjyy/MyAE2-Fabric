@@ -11,6 +11,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 
 public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> {
     private static final String ID = "quartz_glass";
@@ -26,13 +27,13 @@ public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> {
         if (isVibrant) {
             inheritPropDisposable(p -> p
                     .noOcclusion()
-                    .isValidSpawn((p1, p2, p3, p4) -> false)
+                    .isValidSpawn(Blocks::never)
                     .lightLevel(b -> 15));
             def = new QuartzGlassBlockDef(ID + "_vibrant", name, new QuartzGlassBlock(getPeekProp()));
         } else {
             inheritPropDisposable(p -> p
                     .noOcclusion()
-                    .isValidSpawn((p1, p2, p3, p4) -> false));
+                    .isValidSpawn(Blocks::never));
             def = new QuartzGlassBlockDef(ID, name, new QuartzGlassBlock(getPeekProp()));
         }
         return def;

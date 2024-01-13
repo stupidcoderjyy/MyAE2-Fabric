@@ -64,13 +64,24 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     /**
      * 创建一个门方块。需要提供三个贴图，分别为：门的上半部分（id_top.png）、门的下半部分（id_bottom.png）、门的物品（id.png）
-     * @param id 门方块id
-     * @param name 门方块的默认名称
-     * @param type 门的方块材料类型
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param type 方块材料类型
      * @return 门方块容器
      */
     public static DoorBlockDef door(String id, String name, BlockSetType type) {
         return new DoorBlockDef(id, name, type);
+    }
+
+    /**
+     * 创建一个活板门方块。需要提供活板门方块贴图（id.png）
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param type 方块材料类型
+     * @return 活板门方块
+     */
+    public static TrapDoorBlockDef trapDoor(String id, String name, BlockSetType type) {
+        return new TrapDoorBlockDef(id, name, type);
     }
 
     protected static BlockBehaviour.Properties getPeekProp() {
