@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,14 +98,15 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
     }
 
     /**
-     * 创建一个栅栏方块，不需要提供材质文件
+     * 创建一个栅栏门方块，不需要提供材质文件
      * @param id 方块id
      * @param name 方块的默认名称
-     * @param texture 材质资源路径
-     * @return 栅栏方块
+     * @param type 木头类型，这决定了打开栅栏门的声音
+     * @param texture 提供材质的方块，方块模型必须使用生成器，且使用了名为"all"的材质
+     * @return 栅栏门方块
      */
-    public static FenceBlockDef fence(String id, String name, ResourceLocation texture) {
-        return new FenceBlockDef(id, name, texture);
+    public static FenceGateBlockDef fenceGate(String id, String name, WoodType type, BlockDef<?> texture) {
+        return new FenceGateBlockDef(id, name, type, texture);
     }
 
     protected static BlockBehaviour.Properties getPeekProp() {

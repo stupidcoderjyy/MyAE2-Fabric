@@ -16,13 +16,6 @@ public class FenceBlockDef extends BlockDef<FenceBlock>{
     @DataGenOnly
     private Supplier<ResourceLocation> texture;
 
-    public FenceBlockDef(String id, String name, ResourceLocation texture) {
-        super(id, name, new FenceBlock(getPeekProp()));
-        if (Mod.isEnvDataGen) {
-            this.texture = () -> texture;
-        }
-    }
-
     public FenceBlockDef(String id, String name, BlockDef<?> textureBlock) {
         super(id, name, new FenceBlock(getPeekProp()));
         if (Mod.isEnvDataGen) {
