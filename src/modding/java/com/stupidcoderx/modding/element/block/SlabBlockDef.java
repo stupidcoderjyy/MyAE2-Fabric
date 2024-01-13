@@ -9,14 +9,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SlabBlock;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-public class SlabBlockDef extends ExtendedBlockDef<SlabBlock> {
-    private ResourceLocation locTop;
+public class SlabBlockDef extends BlockDef<SlabBlock> {
+    private Supplier<ResourceLocation> modelFull, textureTop, textureSide, textureBottom;
 
     public SlabBlockDef(String id, String name, BlockDef<?> baseBlock) {
-        super(id, name, baseBlock, new SlabBlock(getPeekProp()));
+        super(id, name, new SlabBlock(getPeekProp()));
         if (Mod.isEnvDataGen) {
-            locTop = loc.withSuffix("_top");
+            this.modelFull = () -> baseBlock.loc;
+            this.textureTop = () -> getTexture(baseBlock, "top", "end", "all");
+            this.textureSide = () -> getTexture(baseBlock, "side", "all");
+            this.textureBottom = () -> getTexture(baseBlock, "bottom", "end", "all");
         }
     }
 
@@ -27,18 +31,18 @@ public class SlabBlockDef extends ExtendedBlockDef<SlabBlock> {
                 .variant("type", List.of("bottom", "double", "top"))
                 .condition(state -> switch (state.optionIndex(0)) {
                     case 0 -> new Model(loc);
-                    case 1 -> new Model(baseBlock.loc);
-                    default -> new Model(locTop);
+                    case 1 -> new Model(modelFull.get());
+                    default -> new Model(loc.withSuffix("_top"));
                 });
     }
 
     @Override
     @DataGenOnly
     protected ModelBuilder provideBlockModel() {
-        ResourceLocation top = getBaseBlockTexture("top", "top", "end", "all");
-        ResourceLocation side = getBaseBlockTexture("side", "side", "all");
-        ResourceLocation bottom = getBaseBlockTexture("bottom", "bottom", "end", "all");
-        DataProviders.MODEL_BLOCK.model(locTop)
+        ResourceLocation top = textureTop.get();
+        ResourceLocation side = textureSide.get();
+        ResourceLocation bottom = textureBottom.get();
+        DataProviders.MODEL_BLOCK.model(loc.withSuffix("_top"))
                 .parent("block/slab_top")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);
         return DataProviders.MODEL_BLOCK.model(loc)

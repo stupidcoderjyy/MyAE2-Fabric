@@ -1,6 +1,7 @@
 package com.stupidcoderx.modding.element.block;
 
 import com.stupidcoderx.modding.core.DataGenOnly;
+import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
 import com.stupidcoderx.modding.datagen.model.ModelBuilder;
@@ -8,10 +9,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.StairBlock;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-public class StairsBlockDef extends ExtendedBlockDef<StairBlock> {
+public class StairsBlockDef extends BlockDef<StairBlock> {
+    private Supplier<ResourceLocation> textureTop, textureSide, textureBottom;
+
     public StairsBlockDef(String id, String name, BlockDef<?> baseBlock) {
-        super(id, name, baseBlock, new StairBlock(baseBlock.block.defaultBlockState(), getPeekProp()));
+        super(id, name, new StairBlock(baseBlock.block.defaultBlockState(), getPeekProp()));
+        if (Mod.isEnvDataGen) {
+            this.textureTop = () -> getTexture(baseBlock, "top", "end", "all");
+            this.textureSide = () -> getTexture(baseBlock, "side", "all");
+            this.textureBottom = () -> getTexture(baseBlock, "bottom", "end", "all");
+        }
     }
 
     @Override
@@ -46,9 +55,9 @@ public class StairsBlockDef extends ExtendedBlockDef<StairBlock> {
     @Override
     @DataGenOnly
     protected ModelBuilder provideBlockModel() {
-        ResourceLocation top = getBaseBlockTexture("top", "top", "end", "all");
-        ResourceLocation side = getBaseBlockTexture("side", "side", "all");
-        ResourceLocation bottom = getBaseBlockTexture("bottom", "bottom", "end", "all");
+        ResourceLocation top = textureTop.get();
+        ResourceLocation side = textureSide.get();
+        ResourceLocation bottom = textureBottom.get();
         DataProviders.MODEL_BLOCK.model(loc.withSuffix("_inner"))
                 .parent("block/inner_stairs")
                 .texture("top", top).texture("side", side).texture("bottom", bottom);

@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -82,6 +83,28 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
      */
     public static TrapDoorBlockDef trapDoor(String id, String name, BlockSetType type) {
         return new TrapDoorBlockDef(id, name, type);
+    }
+
+    /**
+     * 创建一个栅栏方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param texture 提供材质的方块，方块模型必须使用生成器，且使用了名为"all"的材质
+     * @return 栅栏方块
+     */
+    public static FenceBlockDef fence(String id, String name, BlockDef<?> texture) {
+        return new FenceBlockDef(id, name, texture);
+    }
+
+    /**
+     * 创建一个栅栏方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param texture 材质资源路径
+     * @return 栅栏方块
+     */
+    public static FenceBlockDef fence(String id, String name, ResourceLocation texture) {
+        return new FenceBlockDef(id, name, texture);
     }
 
     protected static BlockBehaviour.Properties getPeekProp() {
@@ -161,5 +184,19 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
     @DataGenOnly
     protected String getTranslationKey() {
         return "block." + Mod.id() + "." + loc.getPath();
+    }
+
+    @DataGenOnly
+    protected static ResourceLocation getTexture(@NotNull BlockDef<?> def, String ... textureKeys) {
+        if (def.mbBlock == null) {
+            return def.loc;
+        }
+        for (String key : textureKeys) {
+            var res = def.mbBlock.textures.get(key);
+            if (res != null) {
+                return res;
+            }
+        }
+        return def.loc;
     }
 }

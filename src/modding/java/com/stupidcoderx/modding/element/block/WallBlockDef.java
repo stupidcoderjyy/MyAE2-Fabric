@@ -9,16 +9,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.WallBlock;
 
-public class WallBlockDef extends ExtendedBlockDef<WallBlock> {
+import java.util.function.Supplier;
+
+public class WallBlockDef extends BlockDef<WallBlock> {
     @DataGenOnly
     private ResourceLocation locSide, locSideTall, locPost;
+    private Supplier<ResourceLocation> textureSide;
 
     public WallBlockDef(String id, String name, BlockDef<?> baseBlock) {
-        super(id, name, baseBlock, new WallBlock(getPeekProp()));
+        super(id, name, new WallBlock(getPeekProp()));
         if (Mod.isEnvDataGen) {
             this.locSide = loc.withSuffix("_side");
             this.locSideTall = loc.withSuffix("_side_tall");
             this.locPost = loc.withSuffix("_post");
+            this.textureSide = () -> getTexture(baseBlock, "side", "all");
         }
     }
 
@@ -48,7 +52,7 @@ public class WallBlockDef extends ExtendedBlockDef<WallBlock> {
     @DataGenOnly
     protected void provideModel() {
         //不需要为自己创建模型文件
-        ResourceLocation side = getBaseBlockTexture("side", "side", "all");
+        ResourceLocation side = textureSide.get();
         DataProviders.MODEL_BLOCK.model(locSide)
                 .parent("block/template_wall_side").texture("wall", side);
         DataProviders.MODEL_BLOCK.model(locSideTall)
