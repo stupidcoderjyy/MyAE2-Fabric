@@ -52,20 +52,43 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
         return new BlockDef<>(id, name, builder.apply(getPeekProp()));
     }
 
+    /**
+     * 创建一个墙方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param baseBlock 提供材质的方块，方块模型必须使用生成器，需要提供侧面的材质。侧面材质接受"side"或"all"
+     * @return 墙方块容器
+     */
     public static WallBlockDef wall(String id, String name, BlockDef<?> baseBlock) {
         return new WallBlockDef(id, name, baseBlock);
     }
 
+    /**
+     * 创建一个楼梯方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param baseBlock 提供材质的方块，方块模型必须使用生成器，需要提供顶部、侧面和底部的材质。顶部材质接受"top"、"end"或"all"；侧面材质
+     *                  接受"side"或"all"；底部材质接受"bottom"、"end"或"all"
+     * @return 楼梯方块容器
+     */
     public static StairsBlockDef stairs(String id, String name, BlockDef<?> baseBlock) {
         return new StairsBlockDef(id, name, baseBlock);
     }
 
+    /**
+     * 创建一个台阶方块，不需要提供材质文件
+     * @param id 方块id
+     * @param name 方块的默认名称
+     * @param baseBlock 提供材质的方块，方块模型必须使用生成器，需要提供顶部、侧面和底部的材质。顶部材质接受"top"、"end"或"all"；侧面材质
+     *                  接受"side"或"all"；底部材质接受"bottom"、"end"或"all"
+     * @return 台阶方块
+     */
     public static SlabBlockDef slab(String id, String name, BlockDef<?> baseBlock) {
         return new SlabBlockDef(id, name, baseBlock);
     }
 
     /**
-     * 创建一个门方块。需要提供三个贴图，分别为：门的上半部分（id_top.png）、门的下半部分（id_bottom.png）、门的物品（id.png）
+     * 创建一个门方块。需要提供三个贴图，分别为：门的上半部分（[id]_top.png）、门的下半部分（[id]_bottom.png）、门的物品（[id].png）
      * @param id 方块id
      * @param name 方块的默认名称
      * @param type 方块材料类型
@@ -138,7 +161,7 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     @SafeVarargs
     public static void pushProp(Consumer<BlockBehaviour.Properties> ... modifiers) {
-        bpManager.pushProp(false, false,modifiers);
+        bpManager.pushProp(false, false, modifiers);
     }
 
     @SafeVarargs
@@ -148,12 +171,12 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     @SafeVarargs
     public static void pushPropDisposable(Consumer<BlockBehaviour.Properties> ... modifiers) {
-        bpManager.pushProp(false, true,modifiers);
+        bpManager.pushProp(false, true, modifiers);
     }
 
     @SafeVarargs
     public static void inheritPropDisposable(Consumer<BlockBehaviour.Properties> ... modifiers) {
-        bpManager.pushProp(true, true,modifiers);
+        bpManager.pushProp(true, true, modifiers);
     }
 
     public static void dupProp() {

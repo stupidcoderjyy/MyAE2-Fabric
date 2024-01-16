@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class StairsBlockDef extends BlockDef<StairBlock> {
+    @DataGenOnly
     private Supplier<ResourceLocation> textureTop, textureSide, textureBottom;
 
     public StairsBlockDef(String id, String name, BlockDef<?> baseBlock) {

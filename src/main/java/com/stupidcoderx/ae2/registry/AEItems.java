@@ -11,7 +11,7 @@ import com.stupidcoderx.modding.element.item.ItemDef;
 import java.util.Map;
 
 public class AEItems {
-    public static final ItemDef<?> SILICON, FLUIX_CRYSTAL;
+    public static final ItemDef<?> FLUIX_CRYSTAL;
     public static final ItemDef<?> METEORITE_COMPASS;
     public static final Map<AEColor, PaintBallItemDef> PAINT_BALLS, LUMEN_PAINT_BALLS;
 
@@ -19,16 +19,13 @@ public class AEItems {
     public static final ItemDef<?> ENTROPY_MANIPULATOR;
 
     static {
-        ItemDef.pushTab(AECreativeTabs.MAIN);
-        SILICON = ItemDef.simple("silicon", "硅");
-        FLUIX_CRYSTAL = ItemDef.simple("fluix_crystal", "Fluix水晶");
+        FLUIX_CRYSTAL = ItemDef.simple("fluix_crystal", "福鲁伊克斯水晶");
         PAINT_BALLS = PaintBallItemDef.create(false, "染色球");
         LUMEN_PAINT_BALLS = PaintBallItemDef.create(true, "光通染色球");
         METEORITE_COMPASS = new CompassItemDef("陨石罗盘");
-        FLUIX_AXE = ItemDef.tool("fluix_axe", "Fluix斧头", p -> new FluixAxe(6, -3.1f, p));
-        FLUIX_PICKAXE = ItemDef.tool("fluix_pickaxe", "Fluix镐子", p -> new FluixPickaxe(1, -2.8F, p));
+        FLUIX_AXE = ItemDef.tool("fluix_axe", "福鲁伊克斯斧头", p -> new FluixAxe(6, -3.1f, p));
+        FLUIX_PICKAXE = ItemDef.tool("fluix_pickaxe", "福鲁伊克斯镐", p -> new FluixPickaxe(1, -2.8F, p));
         ENTROPY_MANIPULATOR = ItemDef.tool("entropy_manipulator", "熵变机械臂", EntropyManipulatorItem::new);
-        ItemDef.popTab();
     }
 
     public static void build() {
