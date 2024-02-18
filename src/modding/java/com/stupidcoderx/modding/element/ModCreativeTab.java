@@ -67,9 +67,4 @@ public class ModCreativeTab implements ICommonRegistry, IDataGenRegistry {
     public void generateData() {
         DataProviders.LOCALIZATION.register(translationKey, defaultName);
     }
-
-    @Override
-    public void close() {
-        displayItems = null;
-    }
 }

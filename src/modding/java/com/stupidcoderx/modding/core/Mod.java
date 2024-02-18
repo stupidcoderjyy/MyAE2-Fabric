@@ -25,7 +25,6 @@ import java.util.List;
  */
 public abstract class Mod {
     protected static final List<ICommonRegistry> COMMON_REGISTRIES = new ArrayList<>();
-    protected static final List<IClientRegistry> BOOTSTRAP_CLIENT_REGISTRIES = new ArrayList<>();
     protected static final List<IClientRegistry> CLIENT_REGISTRIES = new ArrayList<>();
 
     /**
@@ -48,27 +47,28 @@ public abstract class Mod {
         this.modId = modId;
         instance = this;
         if (IN_CLIENT) {
-            BuiltInModelRegistry.INSTANCE.clientRegister();
-            BOOTSTRAP_CLIENT_REGISTRIES.forEach(IClientRegistry::clientRegister);
+            addClientRegistry(BuiltInModelRegistry.INSTANCE);
+            clientPreInit();
         }
         ModLog.info("begin init: %s", modId);
         Stopwatch watch = Stopwatch.createUnstarted();
         watch.start();
-        buildElements();
+        preInit();
         init();
-        finishInit();
+        postInit();
         ModLog.info("finish init: %s, took %dms", modId, watch.elapsed().toMillis());
     }
 
-    protected abstract void buildElements();
+    protected void preInit() {
+    }
+
+    protected void clientPreInit() {
+    }
 
     /**
      * 模组对象调用MC内部的API进行注册的逻辑
      */
     protected void init() {
-        if (IN_DATA_GEN) {
-            return;
-        }
         COMMON_REGISTRIES.forEach(ICommonRegistry::commonRegister);
         if (IN_CLIENT) {
             CLIENT_REGISTRIES.forEach(IClientRegistry::clientRegister);
@@ -78,19 +78,14 @@ public abstract class Mod {
     /**
      * 模组加载结束，释放资源
      */
-    protected void finishInit() {
+    protected void postInit() {
         if (IN_DATA_GEN) {
             return;
         }
         COMMON_REGISTRIES.forEach(ICommonRegistry::close);
         if (IN_CLIENT) {
             CLIENT_REGISTRIES.forEach(IClientRegistry::close);
-            BOOTSTRAP_CLIENT_REGISTRIES.forEach(IClientRegistry::close);
         }
-    }
-
-    public static void addBootstrapClientRegistry(IClientRegistry reg) {
-        BOOTSTRAP_CLIENT_REGISTRIES.add(reg);
     }
 
     public static void addCommonRegistry(ICommonRegistry reg) {
@@ -105,7 +100,7 @@ public abstract class Mod {
     }
 
     public static void addClientRegistry(IClientRegistry reg) {
-        if (!IN_CLIENT) {
+        if (IN_CLIENT) {
             CLIENT_REGISTRIES.add(reg);
         }
     }

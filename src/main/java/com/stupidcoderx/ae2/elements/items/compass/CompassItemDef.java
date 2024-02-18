@@ -1,5 +1,6 @@
 package com.stupidcoderx.ae2.elements.items.compass;
 
+import com.stupidcoderx.ae2.client.models.CompassModel;
 import com.stupidcoderx.modding.client.BuiltInModelRegistry;
 import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
@@ -18,8 +19,8 @@ import net.minecraft.world.item.Item;
 public class CompassItemDef extends ItemDef<Item> implements IClientRegistry {
     private static final String ID = "meteorite_compass";
     private static final String EXPANDED_ID = "item/" + ID;
-    static final ResourceLocation BASE_LOC = Mod.modLoc(EXPANDED_ID + "_base");
-    static final ResourceLocation POINTER_LOC = Mod.modLoc(EXPANDED_ID + "_pointer");
+    public static final ResourceLocation BASE_LOC = Mod.modLoc(EXPANDED_ID + "_base");
+    public static final ResourceLocation POINTER_LOC = Mod.modLoc(EXPANDED_ID + "_pointer");
 
     public CompassItemDef(String name) {
         super(ID, name, new Item(new Item.Properties().stacksTo(1)));

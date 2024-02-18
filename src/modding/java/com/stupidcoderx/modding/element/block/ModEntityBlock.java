@@ -7,10 +7,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class BaseEntityBlock<E extends BlockEntity> extends OrientableBlock implements EntityBlock {
+public class ModEntityBlock<E extends BlockEntity> extends OrientableBlock implements EntityBlock {
     private BlockEntityType<E> beType;
 
-    public BaseEntityBlock(Properties properties) {
+    public ModEntityBlock(Properties properties) {
         super(properties);
     }
 

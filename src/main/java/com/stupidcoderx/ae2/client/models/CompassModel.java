@@ -1,5 +1,6 @@
-package com.stupidcoderx.ae2.elements.items.compass;
+package com.stupidcoderx.ae2.client.models;
 
+import com.stupidcoderx.ae2.elements.items.compass.CompassItemDef;
 import com.stupidcoderx.modding.client.render.IModCustomModel;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

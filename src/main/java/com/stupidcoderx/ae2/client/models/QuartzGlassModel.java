@@ -1,8 +1,12 @@
-package com.stupidcoderx.ae2.elements.blocks.glass;
+package com.stupidcoderx.ae2.client.models;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.stupidcoderx.ae2.elements.blocks.glass.QuartzGlassBlock;
+import com.stupidcoderx.ae2.elements.blocks.glass.QuartzGlassBlockDef;
 import com.stupidcoderx.modding.client.render.IModCustomModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
@@ -34,6 +38,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+@Environment(EnvType.CLIENT)
 public class QuartzGlassModel implements IModCustomModel {
     //边框的材质，从0001-1111
     private static final Material[] FRAME_TEXTURES = IntStream.range(1, 16)

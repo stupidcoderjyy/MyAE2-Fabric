@@ -1,5 +1,6 @@
 package com.stupidcoderx.ae2.elements.blocks.glass;
 
+import com.stupidcoderx.ae2.client.models.QuartzGlassModel;
 import com.stupidcoderx.modding.client.BuiltInModelRegistry;
 import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> implements IClientRegistry {
     private static final String ID = "quartz_glass";
     private static final String BLOCK_ID = "block/quartz_glass";
-    static final ResourceLocation TEXTURE_BLOCK_LOC = Mod.modLoc("block/glass/" + ID);
+    public static final ResourceLocation TEXTURE_BLOCK_LOC = Mod.modLoc("block/glass/" + ID);
 
     private QuartzGlassBlockDef(String id, String name, QuartzGlassBlock block) {
         super(id, name, block);

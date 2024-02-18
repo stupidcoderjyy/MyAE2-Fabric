@@ -2,8 +2,12 @@ package com.stupidcoderx.modding.element.blockentity;
 
 import com.stupidcoderx.modding.core.ICommonRegistry;
 import com.stupidcoderx.modding.core.Mod;
-import com.stupidcoderx.modding.element.block.BaseEntityBlock;
 import com.stupidcoderx.modding.element.block.EntityBlockDef;
+import com.stupidcoderx.modding.element.block.ModEntityBlock;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +39,12 @@ public class TEDef<E extends BlockEntity> implements ICommonRegistry {
     public void commonRegister() {
         Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, loc, type);
         for (Block b : blockArr) {
-            ((BaseEntityBlock<E>) b).setType(type);
+            ((ModEntityBlock<E>) b).setType(type);
         }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void registerRenderer(BlockEntityRendererProvider<E> provider) {
+        BlockEntityRendererRegistry.register(type, provider);
     }
 }
