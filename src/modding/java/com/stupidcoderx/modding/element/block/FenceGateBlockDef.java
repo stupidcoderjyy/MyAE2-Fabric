@@ -19,15 +19,15 @@ public class FenceGateBlockDef extends BlockDef<FenceGateBlock>{
 
     public FenceGateBlockDef(String id, String name, WoodType type, BlockDef<?> baseBlock) {
         super(id, name, new FenceGateBlock(getPeekProp().noOcclusion(), type));
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             this.texture = () -> getTexture(baseBlock, "all");
         }
     }
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         DataProviders.BLOCK_TAGS.of(BlockTags.FENCE_GATES).add(block);
     }
 

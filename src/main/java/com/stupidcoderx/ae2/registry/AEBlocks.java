@@ -1,8 +1,10 @@
 package com.stupidcoderx.ae2.registry;
 
+import com.stupidcoderx.ae2.elements.blocks.DisplayBlockDef;
 import com.stupidcoderx.ae2.elements.blocks.drive.DriveBlockDef;
 import com.stupidcoderx.ae2.elements.blocks.glass.QuartzGlassBlockDef;
 import com.stupidcoderx.modding.element.block.BlockDef;
+import com.stupidcoderx.modding.element.block.EntityBlockDef;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -13,18 +15,18 @@ import java.util.function.Consumer;
 
 public class AEBlocks {
     //Decorative
-    public static final BlockDef<?> QUARTZ_BLOCK;
+    public static final BlockDef<?> QUARTZ_BLOCK, SKY_STONE;
     public static final BlockDef<?> CUT_QUARTZ_BLOCK, CUT_QUARTZ_STAIRS, CUT_QUARTZ_SLAB,
             CUT_QUARTZ_WALL, CUT_QUARTZ_FENCE, CUT_QUARTZ_FENCE_GATE, CUT_QUARTZ_BUTTON,
             CUT_QUARTZ_TRAPDOOR, CUT_QUARTZ_DOOR;
-
     public static final BlockDef<?> QUARTZ_GLASS, QUARTZ_GLASS_VIBRANT;
-
     public static final BlockDef<?> DRIVE;
+    public static final EntityBlockDef<?> SKY_STONE_CHEST;
     static {
         BlockDef.pushProp(Types.BASE);
         BlockDef.inheritProp(Types.QUARTZ);
         QUARTZ_BLOCK = BlockDef.cubeAll("quartz_block", "赛特斯石英块");
+        SKY_STONE = BlockDef.cubeAll("sky_stone", "陨石");
         CUT_QUARTZ_BLOCK = BlockDef.cubeAll("cut_quartz_block", "切制赛特斯石英块");
         CUT_QUARTZ_STAIRS = BlockDef.stairs("cut_quartz_stairs", "切制赛特斯石英楼梯", CUT_QUARTZ_BLOCK);
         CUT_QUARTZ_SLAB = BlockDef.slab("cut_quartz_slab", "切制赛特斯石英台阶", CUT_QUARTZ_BLOCK);
@@ -43,6 +45,10 @@ public class AEBlocks {
 
         BlockDef.inheritProp(Types.METAL);
         DRIVE = new DriveBlockDef("drive", "ME驱动器");
+        BlockDef.popProp();
+
+        BlockDef.inheritProp(Types.STONE);
+        SKY_STONE_CHEST = new DisplayBlockDef("sky_stone_chest", "陨石箱子");
         BlockDef.popProp();
         BlockDef.popProp();
     }
@@ -66,5 +72,10 @@ public class AEBlocks {
                 .mapColor(MapColor.METAL)
                 .sound(SoundType.METAL)
                 .forceSolidOn();
+
+        public static final Consumer<Properties> STONE = p -> p
+                .mapColor(MapColor.STONE)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops();
     }
 }

@@ -17,7 +17,7 @@ public class SlabBlockDef extends BlockDef<SlabBlock> {
 
     public SlabBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, new SlabBlock(getPeekProp()));
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             this.modelFull = () -> baseBlock.loc;
             this.textureTop = () -> getTexture(baseBlock, "top", "end", "all");
             this.textureSide = () -> getTexture(baseBlock, "side", "all");

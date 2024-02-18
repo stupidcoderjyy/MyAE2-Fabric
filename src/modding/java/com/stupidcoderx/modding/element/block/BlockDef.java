@@ -195,8 +195,8 @@ public class BlockDef<B extends Block> extends ItemDef<BlockItem> {
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         provideBlockState();
     }
 

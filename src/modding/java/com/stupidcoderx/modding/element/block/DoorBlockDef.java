@@ -1,6 +1,7 @@
 package com.stupidcoderx.modding.element.block;
 
 import com.stupidcoderx.modding.core.DataGenOnly;
+import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
@@ -16,15 +17,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class DoorBlockDef extends BlockDef<DoorBlock>{
+public class DoorBlockDef extends BlockDef<DoorBlock> implements IClientRegistry {
     public DoorBlockDef(String id, String name, BlockSetType type) {
         super(id, name, new DoorBlock(getPeekProp(), type));
+        Mod.addClientRegistry(this);
     }
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         DataProviders.BLOCK_TAGS.of(BlockTags.DOORS).add(block);
     }
 

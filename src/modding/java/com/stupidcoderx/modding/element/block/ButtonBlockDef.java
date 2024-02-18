@@ -20,15 +20,15 @@ public class ButtonBlockDef extends BlockDef<ButtonBlock>{
 
     public ButtonBlockDef(String id, String name, BlockSetType type, BlockDef<?> textureBlock, int ticksToStayPressed, boolean arrowCanPress) {
         super(id, name, new ButtonBlock(getPeekProp(), type, ticksToStayPressed, arrowCanPress));
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             this.texture = () -> getTexture(textureBlock, "all");
         }
     }
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         DataProviders.BLOCK_TAGS.of(BlockTags.BUTTONS).add(block);
     }
 

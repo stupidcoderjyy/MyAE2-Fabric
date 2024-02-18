@@ -1,0 +1,110 @@
+{
+  "variants": {
+    "facing=east,face=ceiling,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 180,
+      "y": 270
+    },
+    "facing=east,face=ceiling,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 180,
+      "y": 270
+    },
+    "facing=east,face=floor,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "y": 90
+    },
+    "facing=east,face=floor,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "y": 90
+    },
+    "facing=east,face=wall,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,face=wall,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,face=ceiling,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 180,
+      "y": 180
+    },
+    "facing=north,face=ceiling,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 180,
+      "y": 180
+    },
+    "facing=north,face=floor,powered=false": {
+      "model": "ae2:block/cut_quartz_button"
+    },
+    "facing=north,face=floor,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed"
+    },
+    "facing=north,face=wall,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 90
+    },
+    "facing=north,face=wall,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 90
+    },
+    "facing=south,face=ceiling,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 180
+    },
+    "facing=south,face=ceiling,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 180
+    },
+    "facing=south,face=floor,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "y": 180
+    },
+    "facing=south,face=floor,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "y": 180
+    },
+    "facing=south,face=wall,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,face=wall,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west,face=ceiling,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 180,
+      "y": 90
+    },
+    "facing=west,face=ceiling,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 180,
+      "y": 90
+    },
+    "facing=west,face=floor,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "y": 270
+    },
+    "facing=west,face=floor,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "y": 270
+    },
+    "facing=west,face=wall,powered=false": {
+      "model": "ae2:block/cut_quartz_button",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,face=wall,powered=true": {
+      "model": "ae2:block/cut_quartz_button_pressed",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

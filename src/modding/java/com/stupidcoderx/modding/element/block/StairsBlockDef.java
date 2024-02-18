@@ -17,7 +17,7 @@ public class StairsBlockDef extends BlockDef<StairBlock> {
 
     public StairsBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, new StairBlock(baseBlock.block.defaultBlockState(), getPeekProp()));
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             this.textureTop = () -> getTexture(baseBlock, "top", "end", "all");
             this.textureSide = () -> getTexture(baseBlock, "side", "all");
             this.textureBottom = () -> getTexture(baseBlock, "bottom", "end", "all");

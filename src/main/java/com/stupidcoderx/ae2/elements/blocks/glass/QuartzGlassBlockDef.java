@@ -1,6 +1,7 @@
 package com.stupidcoderx.ae2.elements.blocks.glass;
 
 import com.stupidcoderx.modding.client.BuiltInModelRegistry;
+import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
@@ -13,13 +14,14 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 
-public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> {
+public class QuartzGlassBlockDef extends BlockDef<QuartzGlassBlock> implements IClientRegistry {
     private static final String ID = "quartz_glass";
     private static final String BLOCK_ID = "block/quartz_glass";
     static final ResourceLocation TEXTURE_BLOCK_LOC = Mod.modLoc("block/glass/" + ID);
 
     private QuartzGlassBlockDef(String id, String name, QuartzGlassBlock block) {
         super(id, name, block);
+        Mod.addClientRegistry(this);
     }
 
     public static QuartzGlassBlockDef create(String name, boolean isVibrant) {

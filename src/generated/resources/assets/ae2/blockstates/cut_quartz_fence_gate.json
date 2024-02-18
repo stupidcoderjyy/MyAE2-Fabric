@@ -1,0 +1,80 @@
+{
+  "variants": {
+    "facing=east,in_wall=false,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate",
+      "uvLock": true,
+      "y": 270
+    },
+    "facing=east,in_wall=false,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_open",
+      "uvLock": true,
+      "y": 270
+    },
+    "facing=east,in_wall=true,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall",
+      "uvLock": true,
+      "y": 270
+    },
+    "facing=east,in_wall=true,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall_open",
+      "uvLock": true,
+      "y": 270
+    },
+    "facing=north,in_wall=false,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate",
+      "uvLock": true,
+      "y": 180
+    },
+    "facing=north,in_wall=false,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_open",
+      "uvLock": true,
+      "y": 180
+    },
+    "facing=north,in_wall=true,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall",
+      "uvLock": true,
+      "y": 180
+    },
+    "facing=north,in_wall=true,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall_open",
+      "uvLock": true,
+      "y": 180
+    },
+    "facing=south,in_wall=false,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate",
+      "uvLock": true
+    },
+    "facing=south,in_wall=false,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_open",
+      "uvLock": true
+    },
+    "facing=south,in_wall=true,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall",
+      "uvLock": true
+    },
+    "facing=south,in_wall=true,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall_open",
+      "uvLock": true
+    },
+    "facing=west,in_wall=false,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate",
+      "uvLock": true,
+      "y": 90
+    },
+    "facing=west,in_wall=false,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_open",
+      "uvLock": true,
+      "y": 90
+    },
+    "facing=west,in_wall=true,open=false": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall",
+      "uvLock": true,
+      "y": 90
+    },
+    "facing=west,in_wall=true,open=true": {
+      "model": "ae2:block/cut_quartz_fence_gate_wall_open",
+      "uvLock": true,
+      "y": 90
+    }
+  }
+}

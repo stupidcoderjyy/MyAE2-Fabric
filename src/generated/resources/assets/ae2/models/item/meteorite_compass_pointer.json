@@ -1,0 +1,46 @@
+{
+    "parent": "minecraft:block/block",
+    "elements": [
+        {
+            "faces": {
+                "east": {
+                    "texture": "#0",
+                    "uv": [
+                        0.0, 8.0, 16.0, 11.0
+                    ]
+                },
+                "south": {
+                    "rotation": 90,
+                    "texture": "#0",
+                    "uv": [
+                        0.0, 8.0, 0.5, 8.5
+                    ]
+                },
+                "up": {
+                    "rotation": 270,
+                    "texture": "#0",
+                    "uv": [
+                        0.0, 8.0, 16.0, 11.0
+                    ]
+                },
+                "west": {
+                    "rotation": 180,
+                    "texture": "#0",
+                    "uv": [
+                        0.0, 8.0, 16.0, 11.0
+                    ]
+                }
+            },
+            "from": [
+                7.75, 1.0, 8.0
+            ],
+            "name": "cube2",
+            "to": [
+                8.25, 1.5, 10.0
+            ]
+        }
+    ],
+    "textures": {
+        "0": "ae2:item/meteorite_compass"
+    }
+}

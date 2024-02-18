@@ -2,9 +2,7 @@ package com.stupidcoderx.modding.core;
 
 import com.google.common.base.Stopwatch;
 import com.stupidcoderx.modding.client.BuiltInModelRegistry;
-import com.stupidcoderx.modding.datagen.recipe.RecipeDef;
-import com.stupidcoderx.modding.element.ModCreativeTab;
-import com.stupidcoderx.modding.element.item.ItemDef;
+import com.stupidcoderx.modding.datagen.DataGenEntryPoint;
 import com.stupidcoderx.modding.util.DimensionalBlockPos;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -26,26 +24,19 @@ import java.util.List;
  * 作为客户端和服务端启动点
  */
 public abstract class Mod {
-    protected static List<IRegistry> registries = new ArrayList<>();
+    protected static final List<ICommonRegistry> COMMON_REGISTRIES = new ArrayList<>();
+    protected static final List<IClientRegistry> BOOTSTRAP_CLIENT_REGISTRIES = new ArrayList<>();
+    protected static final List<IClientRegistry> CLIENT_REGISTRIES = new ArrayList<>();
+
     /**
      * 模组是否运行在数据生成环境中
      */
-    public static final boolean isEnvDataGen = System.getProperty("fabric-api.datagen") != null;
+    public static final boolean IN_DATA_GEN = System.getProperty("fabric-api.datagen") != null;
     /**
      * 模组是否运行在客户端环境下
      */
-    public static final boolean isEnvClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
-    /**
-     * 负责注册一系列{@link ModCreativeTab}<p>
-     * 所有{@link ModCreativeTab}在初始化过程中会自动注册进此对象
-     */
-    public static final RegistryList<ModCreativeTab> CREATIVE_TAB_REGISTRY = create("creativeTab");
-    /**
-     * 负责注册一系列{@link ItemDef}<p>
-     * 所有{@link ItemDef}在初始化过程中会自动注册进此对象
-     */
-    public static final RegistryList<ItemDef<?>> ITEM_LIKE_REGISTRY = create("item");
-    public static final RegistryList<RecipeDef<?>> RECIPE_REGISTRY = create("recipe");
+    public static final boolean IN_CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+
     private static Mod instance;
     public final String modId;
 
@@ -56,10 +47,11 @@ public abstract class Mod {
     protected Mod(String modId) {
         this.modId = modId;
         instance = this;
-        if (isEnvClient) {
-            bootstrapClient();
+        if (IN_CLIENT) {
+            BuiltInModelRegistry.INSTANCE.clientRegister();
+            BOOTSTRAP_CLIENT_REGISTRIES.forEach(IClientRegistry::clientRegister);
         }
-        ModLog.info("begin init: %s, registries: %s", modId, registries);
+        ModLog.info("begin init: %s", modId);
         Stopwatch watch = Stopwatch.createUnstarted();
         watch.start();
         buildElements();
@@ -68,20 +60,18 @@ public abstract class Mod {
         ModLog.info("finish init: %s, took %dms", modId, watch.elapsed().toMillis());
     }
 
-    /**
-     * 模组对象构造和注册逻辑（注册进{@link #registries}）
-     */
     protected abstract void buildElements();
 
     /**
      * 模组对象调用MC内部的API进行注册的逻辑
      */
     protected void init() {
-        for (IRegistry r : registries) {
-            r.commonRegister();
-            if (isEnvClient) {
-                r.clientRegister();
-            }
+        if (IN_DATA_GEN) {
+            return;
+        }
+        COMMON_REGISTRIES.forEach(ICommonRegistry::commonRegister);
+        if (IN_CLIENT) {
+            CLIENT_REGISTRIES.forEach(IClientRegistry::clientRegister);
         }
     }
 
@@ -89,14 +79,35 @@ public abstract class Mod {
      * 模组加载结束，释放资源
      */
     protected void finishInit() {
-        for (IRegistry r : registries) {
-            r.close();
+        if (IN_DATA_GEN) {
+            return;
         }
-        registries = null;
+        COMMON_REGISTRIES.forEach(ICommonRegistry::close);
+        if (IN_CLIENT) {
+            CLIENT_REGISTRIES.forEach(IClientRegistry::close);
+            BOOTSTRAP_CLIENT_REGISTRIES.forEach(IClientRegistry::close);
+        }
     }
 
-    protected void bootstrapClient() {
-        registries.add(BuiltInModelRegistry.INSTANCE);
+    public static void addBootstrapClientRegistry(IClientRegistry reg) {
+        BOOTSTRAP_CLIENT_REGISTRIES.add(reg);
+    }
+
+    public static void addCommonRegistry(ICommonRegistry reg) {
+        COMMON_REGISTRIES.add(reg);
+    }
+
+    public static void addDataGenRegistry(IDataGenRegistry reg) {
+        if (!IN_DATA_GEN) {
+            return;
+        }
+        DataGenEntryPoint.DATA_GEN_REGISTRIES.add(reg);
+    }
+
+    public static void addClientRegistry(IClientRegistry reg) {
+        if (!IN_CLIENT) {
+            CLIENT_REGISTRIES.add(reg);
+        }
     }
 
     /**
@@ -126,12 +137,6 @@ public abstract class Mod {
             return loc;
         }
         return new ResourceLocation(loc.getNamespace(), prefix + "/" + path);
-    }
-
-    private static <T extends IRegistry> RegistryList<T> create(String name) {
-        RegistryList<T> r = new RegistryList<>(name);
-        registries.add(r);
-        return r;
     }
 
     /**

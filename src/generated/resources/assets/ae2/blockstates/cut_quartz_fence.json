@@ -1,0 +1,48 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_fence_post"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_fence_side",
+        "uvLock": true
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_fence_side",
+        "uvLock": true,
+        "y": 90
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_fence_side",
+        "uvLock": true,
+        "y": 180
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_fence_side",
+        "uvLock": true,
+        "y": 270
+      },
+      "when": {
+        "west": "true"
+      }
+    }
+  ]
+}

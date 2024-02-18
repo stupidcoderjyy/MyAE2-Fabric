@@ -1,6 +1,8 @@
 package com.stupidcoderx.modding.element.block;
 
 import com.stupidcoderx.modding.core.DataGenOnly;
+import com.stupidcoderx.modding.core.IClientRegistry;
+import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.datagen.blockstate.Model;
 import com.stupidcoderx.modding.datagen.model.ModelBuilder;
@@ -15,15 +17,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TrapDoorBlockDef extends BlockDef<TrapDoorBlock>{
+public class TrapDoorBlockDef extends BlockDef<TrapDoorBlock> implements IClientRegistry {
     public TrapDoorBlockDef(String id, String name, BlockSetType type) {
         super(id, name, new TrapDoorBlock(getPeekProp().noOcclusion(), type));
+        Mod.addClientRegistry(this);
     }
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         DataProviders.BLOCK_TAGS.of(BlockTags.TRAPDOORS).add(block);
     }
 

@@ -1,7 +1,8 @@
 package com.stupidcoderx.modding.element.item;
 
 import com.stupidcoderx.modding.core.DataGenOnly;
-import com.stupidcoderx.modding.core.IRegistry;
+import com.stupidcoderx.modding.core.ICommonRegistry;
+import com.stupidcoderx.modding.core.IDataGenRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.element.ModCreativeTab;
@@ -22,7 +23,7 @@ import java.util.function.Function;
  * 模组物品容器，负责物品的各种注册、数据生成和其他操作。
  * @param <I> 物品类
  */
-public class ItemDef<I extends Item> implements IRegistry, ItemLike {
+public class ItemDef<I extends Item> implements ICommonRegistry, IDataGenRegistry, ItemLike {
     private static final Stack<Object> TABS = new Stack<>();
     public final I item;
     public final ResourceLocation loc;
@@ -32,7 +33,8 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
         this.item = item;
         this.loc = loc;
         this.defaultName = name;
-        Mod.ITEM_LIKE_REGISTRY.add(this);
+        Mod.addCommonRegistry(this);
+        Mod.addDataGenRegistry(this);
         TABS.forEach(this::handleTab);
     }
 
@@ -85,9 +87,9 @@ public class ItemDef<I extends Item> implements IRegistry, ItemLike {
         Registry.register(BuiltInRegistries.ITEM, loc, item);
     }
 
-    @Override
     @DataGenOnly
-    public void provideData() {
+    @Override
+    public void generateData() {
         provideModel();
         DataProviders.LOCALIZATION.register(getTranslationKey(), getDefaultName());
     }

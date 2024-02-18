@@ -12,7 +12,7 @@ public class ModLog {
     }
 
     private static Logger getLogger() {
-        return Mod.isEnvClient ? CLIENT : SERVER;
+        return Mod.IN_CLIENT ? CLIENT : SERVER;
     }
 
     public static void log(Level level, String message, Object... params) {

@@ -1,7 +1,8 @@
 package com.stupidcoderx.modding.element;
 
 import com.google.common.base.Preconditions;
-import com.stupidcoderx.modding.core.IRegistry;
+import com.stupidcoderx.modding.core.ICommonRegistry;
+import com.stupidcoderx.modding.core.IDataGenRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * 模组创造模式物品栏，创建对象即可完成注册
  */
-public class ModCreativeTab implements IRegistry {
+public class ModCreativeTab implements ICommonRegistry, IDataGenRegistry {
     private List<ItemLike> displayItems = new ArrayList<>();
     private final ResourceKey<CreativeModeTab> key;
     private final Supplier<ItemLike> iconSupplier;
@@ -39,7 +40,8 @@ public class ModCreativeTab implements IRegistry {
         this.translationKey = "tab." + Mod.id() + "." + id;
         this.defaultName = defaultName;
         this.key = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Mod.modLoc(id));
-        Mod.CREATIVE_TAB_REGISTRY.add(this);
+        Mod.addCommonRegistry(this);
+        Mod.addDataGenRegistry(this);
     }
 
     /**
@@ -62,7 +64,7 @@ public class ModCreativeTab implements IRegistry {
     }
 
     @Override
-    public void provideData() {
+    public void generateData() {
         DataProviders.LOCALIZATION.register(translationKey, defaultName);
     }
 

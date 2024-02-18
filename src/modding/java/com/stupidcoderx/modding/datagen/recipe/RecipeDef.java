@@ -2,7 +2,8 @@ package com.stupidcoderx.modding.datagen.recipe;
 
 import com.google.gson.JsonObject;
 import com.stupidcoderx.modding.core.DataGenOnly;
-import com.stupidcoderx.modding.core.IRegistry;
+import com.stupidcoderx.modding.core.ICommonRegistry;
+import com.stupidcoderx.modding.core.IDataGenRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import net.minecraft.core.Registry;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
  * @param <R> 配方子类
  * @see ModRecipe
  */
-public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, RecipeSerializer<R> {
+public final class RecipeDef<R extends ModRecipe<R>> implements ICommonRegistry, IDataGenRegistry, RecipeSerializer<R> {
     final RecipeType<R> type;
     final ResourceLocation typeLoc;
     @DataGenOnly
@@ -43,9 +44,10 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
                 return typeId;
             }
         };
-        recipeFactories = Mod.isEnvDataGen ? new HashMap<>() : null;
+        recipeFactories = Mod.IN_DATA_GEN ? new HashMap<>() : null;
         this.emptyRecipeSupplier = emptyRecipeSupplier;
-        Mod.RECIPE_REGISTRY.add(this);
+        Mod.addCommonRegistry(this);
+        Mod.addDataGenRegistry(this);
     }
 
     /**
@@ -56,7 +58,7 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
      */
     @DataGenOnly
     public RecipeDef<R> register(String recipeId, Consumer<R> builder) {
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             recipeFactories.put(Mod.modLoc(typeLoc.getPath() + "/" + recipeId), builder);
         }
         return this;
@@ -79,7 +81,7 @@ public final class RecipeDef<R extends ModRecipe<R>> implements IRegistry, Recip
     }
 
     @Override
-    public void provideData() {
+    public void generateData() {
         DataProviders.RECIPE.registerType(this);
     }
 

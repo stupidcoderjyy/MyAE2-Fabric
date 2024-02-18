@@ -1,6 +1,7 @@
 package com.stupidcoderx.ae2.elements.items;
 
 import com.stupidcoderx.ae2.util.AEColor;
+import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import com.stupidcoderx.modding.datagen.DataProviders;
 import com.stupidcoderx.modding.element.item.ItemDef;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.Item;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PaintBallItemDef extends ItemDef<Item> {
+public class PaintBallItemDef extends ItemDef<Item> implements IClientRegistry {
     public final boolean isLumen;
     public final AEColor color;
 
@@ -21,6 +22,7 @@ public class PaintBallItemDef extends ItemDef<Item> {
         super(getLoc(isLumen, color), name, new Item(new Item.Properties()));
         this.isLumen = isLumen;
         this.color = color;
+        Mod.addClientRegistry(this);
     }
 
     private static ResourceLocation getLoc(boolean isLumen, AEColor color) {

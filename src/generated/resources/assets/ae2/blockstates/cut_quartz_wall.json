@@ -1,0 +1,88 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side"
+      },
+      "when": {
+        "north": "low"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side_tall"
+      },
+      "when": {
+        "north": "tall"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side",
+        "uvLock": true,
+        "y": 90
+      },
+      "when": {
+        "east": "low"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side_tall",
+        "uvLock": true,
+        "y": 90
+      },
+      "when": {
+        "east": "tall"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side",
+        "uvLock": true,
+        "y": 180
+      },
+      "when": {
+        "south": "low"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side_tall",
+        "uvLock": true,
+        "y": 180
+      },
+      "when": {
+        "south": "tall"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side",
+        "uvLock": true,
+        "y": 270
+      },
+      "when": {
+        "west": "low"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_side_tall",
+        "uvLock": true,
+        "y": 270
+      },
+      "when": {
+        "west": "tall"
+      }
+    },
+    {
+      "apply": {
+        "model": "ae2:block/cut_quartz_wall_post"
+      },
+      "when": {
+        "up": "true"
+      }
+    }
+  ]
+}

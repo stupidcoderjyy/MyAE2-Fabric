@@ -18,7 +18,7 @@ public class WallBlockDef extends BlockDef<WallBlock> {
 
     public WallBlockDef(String id, String name, BlockDef<?> baseBlock) {
         super(id, name, new WallBlock(getPeekProp()));
-        if (Mod.isEnvDataGen) {
+        if (Mod.IN_DATA_GEN) {
             this.locSide = loc.withSuffix("_side");
             this.locSideTall = loc.withSuffix("_side_tall");
             this.locPost = loc.withSuffix("_post");
@@ -28,8 +28,8 @@ public class WallBlockDef extends BlockDef<WallBlock> {
 
     @Override
     @DataGenOnly
-    public void provideData() {
-        super.provideData();
+    public void generateData() {
+        super.generateData();
         DataProviders.BLOCK_TAGS.of(BlockTags.WALLS).add(block).replaceVanilla(false);
     }
 

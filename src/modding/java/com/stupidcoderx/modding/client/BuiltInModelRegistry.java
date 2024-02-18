@@ -1,7 +1,7 @@
 package com.stupidcoderx.modding.client;
 
 import com.stupidcoderx.modding.client.render.IModCustomModel;
-import com.stupidcoderx.modding.core.IRegistry;
+import com.stupidcoderx.modding.core.IClientRegistry;
 import com.stupidcoderx.modding.core.Mod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
-public class BuiltInModelRegistry implements IRegistry, ModelResourceProvider {
+public class BuiltInModelRegistry implements IClientRegistry, ModelResourceProvider {
     private final Map<ResourceLocation, IModCustomModel> models = new HashMap<>();
     public static final BuiltInModelRegistry INSTANCE = new BuiltInModelRegistry();
 
